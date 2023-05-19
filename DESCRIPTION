@@ -1,0 +1,18 @@
+Package: datarx.pilotADaM
+Type: Package
+Title: Inspired by the CDISC_pilot_replication project, convert it to a whole new R package, and re-implment all the tables
+Version: 0.1.0
+Author: c(
+        person("Yong", "Lin", , "yong.lin@datarx.cn", role = c("cre", "aut")),
+        person("Palan DataRx", "Co. Ltd", role = c("cph", "fnd"))
+    )
+Maintainer: The package maintainer <yourself@somewhere.net>
+Description: Inspired by the CDISC_pilot_replication project, SafetyData project and PHUSE TestDataFactory, migrate the CDISC data into a R package and re-implement the tables defined int he cdiscpilot project. A shiny example is created to demo the tables.
+License: MIT + file LICENSE
+URL: https://github.com/palandatarxcom/datarx.pilotADaM
+BugReports: https://github.com/palandatarxcom/datarx.pilotADaM/issues
+Encoding: UTF-8
+LazyData: true
+Depends: 
+    R (>= 3.10)
+RoxygenNote: 7.2.3
