@@ -16,3 +16,17 @@ LazyData: true
 Depends: 
     R (>= 3.10)
 RoxygenNote: 7.2.3
+Imports: 
+    car,
+    dplyr,
+    emmeans,
+    glue,
+    huxtable,
+    lme4,
+    readxl,
+    rlang,
+    stringr,
+    tibble,
+    tidyr,
+    tidyselect,
+    vcdExtra

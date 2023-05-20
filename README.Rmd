@@ -11,6 +11,10 @@ knitr::opts_chunk$set(
   fig.path = "man/figures/README-",
   out.width = "100%"
 )
+
+options(
+  huxtable.knitr_output_format = "html"
+)
 ```
 
 
@@ -56,9 +60,20 @@ devtools::install_github("palandatarxcom/datarx.pilotADaM")
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
-
-```{r example}
+### Table 14-1.01 Summary of Population
+```{r t14_101}
 library(datarx.pilotADaM)
-## basic example code
+
+ht <- gen_ht_t14_101(adam_adsl)
+
+ht |> huxtable::set_caption("Table 14-1.01 Summary of Population")
+```
+
+### Table 14-1.02 Summary of End of Study Data
+```{r t14_102}
+library(datarx.pilotADaM)
+
+ht <- gen_ht_t14_102(adam_adsl)
+
+ht |> huxtable::set_caption("Table 14-1.02 Summary of End of Study Data")
 ```
