@@ -9,6 +9,7 @@
 #' @importFrom dplyr lag
 #' @importFrom glue glue
 #' @importFrom huxtable as_hux
+#' @importFrom huxtable merge_cells
 #' @importFrom huxtable set_align
 #' @importFrom huxtable set_bold
 #' @importFrom huxtable set_bottom_border
@@ -24,5 +25,7 @@
 #' @importFrom tibble add_row
 #' @importFrom tidyr complete
 #' @importFrom tidyr nesting
+#' @importFrom tidyr pivot_longer
+#' @importFrom tidyr pivot_wider
 ## usethis namespace: end
 NULL

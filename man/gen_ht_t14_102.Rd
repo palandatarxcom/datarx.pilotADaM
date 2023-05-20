@@ -10,6 +10,9 @@ gen_ht_t14_102(adsl)
 \arguments{
 \item{adsl}{ADaM ADSL data set}
 }
+\value{
+a huxtable table
+}
 \description{
 gen_ht_t14_102
 Generate Table 14-1.02 Summary of End of Study Data
