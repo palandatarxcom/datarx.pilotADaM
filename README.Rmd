@@ -63,6 +63,7 @@ devtools::install_github("palandatarxcom/datarx.pilotADaM")
 ### Table 14-1.01 Summary of Population
 ```{r message = FALSE, warning = FALSE}
 library(datarx.pilotADaM)
+library(huxtable)
 
 ht <- gen_ht_t14_101(adam_adsl)
 
@@ -77,11 +78,21 @@ ht <- gen_ht_t14_102(adam_adsl)
 
 ht |> huxtable::set_caption("Table 14-1.02 Summary of End of Study Data")
 ```
-### Table 14-1.03 Summary of End of Study Data
+
+### Table 14-1.03 Summary of Number of Subjects By Site
 ```{r message = FALSE, warning = FALSE}
 library(datarx.pilotADaM)
 
 ht <- gen_ht_t14_103(adam_adsl)
 
 ht |> huxtable::set_caption("Table 14-1.03 Summary of Number of Subjects By Site")
+```
+
+### Table 14-2.01 Summary of Demographic and Baseline Characteristics
+```{r message = FALSE, warning = FALSE}
+library(datarx.pilotADaM)
+
+ht <- gen_ht_t14_201(adam_adsl)
+
+ht |> huxtable::set_caption("Table 14-2.01 Summary of Demographic and Baseline Characteristics")
 ```

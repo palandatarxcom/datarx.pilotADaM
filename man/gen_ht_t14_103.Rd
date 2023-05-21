@@ -8,7 +8,7 @@ Generate Table 14-1.03 Summary of Number of Subjects By Site}
 gen_ht_t14_103(adsl)
 }
 \arguments{
-\item{adsl}{}
+\item{adsl}{ADaM ADSL data set}
 }
 \value{
 a huxtable table
