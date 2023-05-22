@@ -6,5 +6,5 @@ source(here("data-raw","adam","prepareData.R"))
 source(here("data-raw","adam","prepareRoxygen.R"))
 
 #SDTM
-#source(here("data-raw","sdtm","prepareData.R"))
-#source(here("data-raw","sdtm","prepareRoxygen.R"))
+source(here("data-raw","sdtm","prepareData.R"))
+source(here("data-raw","sdtm","prepareRoxygen.R"))
