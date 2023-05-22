@@ -598,7 +598,7 @@ gen_ht_t14_201 <- function(adsl) {
     select(rowlbl1, rowlbl2, `0`, `54`, `81`, `99`, p)
 
   ## Table build
-  ht <- as_hux(final, add_colnames = FALSE)
+  ht <- huxtable::as_hux(final, add_colnames = FALSE)
 
   huxtable::bottom_border(ht)[1, ] <- 1
   huxtable::valign(ht)[1, ] <- 'bottom'
@@ -609,6 +609,55 @@ gen_ht_t14_201 <- function(adsl) {
   huxtable::col_width(ht) <- c(.2, .2, .12, .12, .12, .12, .12)
   huxtable::bottom_padding(ht) <- 0
   huxtable::top_padding(ht) <- 0
+
+  return(ht)
+}
+
+
+#' gen_ht_t14_301
+#' Generate Table 14-3.01 Primary Endpoint Analysis: ADAS Cog (11) - Change from Baseline to Week 24 - LOCF
+#'
+#' @param adadas
+#'
+#' @return a huxtable
+#' @export
+#'
+#' @examples
+gen_ht_t14_301 <- function(adadas) {
+  adas <- adam_adadas |>
+    filter(EFFFL == "Y" & ITTFL=='Y' & PARAMCD == 'ACTOT' & ANL01FL == 'Y')
+
+  # Calculate the header Ns ----
+  header_n <- adas |>
+    distinct(USUBJID, TRTP, TRTPN) |>
+    get_header_n(TRTP, TRTPN)
+
+  column_headers <- header_n |>
+    select(-N) |>
+    pivot_wider(names_from = TRTPN, values_from=labels) |>
+    mutate(rowlbl1 = '')
+
+  # Run each group ----
+  summary_portion <- bind_rows(summary_data(adas, AVAL, 0 , 'Baseline'),
+                               summary_data(adas, AVAL, 24, 'Week 24'),
+                               summary_data(adas, CHG,  24, 'Change from Baseline')) |>
+    pad_row()
+
+  ## Gather the model data ----
+  model_portion <- efficacy_models(adas, 'CHG', 24)
+
+  final <- bind_rows(column_headers, summary_portion, model_portion) |>
+    select(rowlbl1, `0`, `54`, `81`)
+
+  # Create the table ----
+  ht <- huxtable::as_hux(final, add_colnames = FALSE) |>
+    huxtable::set_bold(1, 1:ncol(final), TRUE) |>
+    huxtable::set_align(1, 1:ncol(final), 'center') |>
+    huxtable::set_valign(1, 1:ncol(final), 'bottom') |>
+    huxtable::set_bottom_border(1, 1:ncol(final), 1) |>
+    huxtable::set_width(1.2) |>
+    huxtable::set_escape_contents(FALSE) |>
+    huxtable::set_col_width(c(.5, 1/6, 1/6, 1/6))
 
   return(ht)
 }
