@@ -88,11 +88,11 @@ ht <- gen_ht_t14_103(adam_adsl)
 ht |> huxtable::set_caption("Table 14-1.03 Summary of Number of Subjects By Site")
 ```
 
-### Table 14-2.01 Summary of Demographic and Baseline Characteristics
+### Table 14-3.01 Primary Endpoint Analysis: ADAS Cog (11) - Change from Baseline to Week 24 - LOCF
 ```{r message = FALSE, warning = FALSE}
 library(datarx.pilotADaM)
 
-ht <- gen_ht_t14_201(adam_adsl)
+ht <- gen_ht_t14_301(adam_adadas)
 
-ht |> huxtable::set_caption("Table 14-2.01 Summary of Demographic and Baseline Characteristics")
+ht |> huxtable::set_caption("Table 14-3.01 Primary Endpoint Analysis: ADAS Cog (11) - Change from Baseline to Week 24 - LOCF")
 ```
