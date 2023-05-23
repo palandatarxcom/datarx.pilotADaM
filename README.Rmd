@@ -88,11 +88,70 @@ ht <- gen_ht_t14_103(adam_adsl)
 ht |> huxtable::set_caption("Table 14-1.03 Summary of Number of Subjects By Site")
 ```
 
-### Table 14-3.01 Primary Endpoint Analysis: ADAS Cog (11) - Change from Baseline to Week 24 - LOCF
+### Table 14-3.02 Primary Endpoint Analysis: CIBIC+ - Summary at Week 24 - LOCF
 ```{r message = FALSE, warning = FALSE}
 library(datarx.pilotADaM)
 
-ht <- gen_ht_t14_301(adam_adadas)
+ht <- gen_ht_t14_302(adam_adcibc)
 
-ht |> huxtable::set_caption("Table 14-3.01 Primary Endpoint Analysis: ADAS Cog (11) - Change from Baseline to Week 24 - LOCF")
+ht |> huxtable::set_caption("Table 14-3.02 Primary Endpoint Analysis: CIBIC+ - Summary at Week 24 - LOCF")
 ```
+
+
+### Table 14-3.03 ADAS Cog (11) - Change from Baseline to Week 8 - LOCF
+```{r message = FALSE, warning = FALSE}
+library(datarx.pilotADaM)
+
+ht <- gen_ht_t14_303(adam_adadas)
+
+ht |> huxtable::set_caption("Table 14-3.03 ADAS Cog (11) - Change from Baseline to Week 8 - LOCF")
+```
+
+
+### Table 14-3.04 CIBIC+ - Summary at Week 8 - LOCF
+```{r message = FALSE, warning = FALSE}
+library(datarx.pilotADaM)
+
+ht <- gen_ht_t14_304(adam_adcibc)
+
+ht |> huxtable::set_caption("Table 14-3.04 CIBIC+ - Summary at Week 8 - LOCF")
+```
+
+### Table 14-3.05 ADAS Cog (11) - Change from Baseline to Week 16 - LOCF
+```{r message = FALSE, warning = FALSE}
+library(datarx.pilotADaM)
+
+ht <- gen_ht_t14_305(adam_adadas)
+
+ht |> huxtable::set_caption("Table 14-3.05 ADAS Cog (11) - Change from Baseline to Week 16 - LOCF")
+```
+
+
+### Table 14-3.06 CIBIC+ - Summary at Week 16 - LOCF
+```{r message = FALSE, warning = FALSE}
+library(datarx.pilotADaM)
+
+ht <- gen_ht_t14_306(adam_adcibc)
+
+ht |> huxtable::set_caption("Table 14-3.06 CIBIC+ - Summary at Week 16 - LOCF")
+```
+
+
+### Table 14-3.07 ADAS Cog (11) - Change from Baseline to Week 24 - Completers at Wk 24-Observed Cases-Windowed
+```{r message = FALSE, warning = FALSE}
+library(datarx.pilotADaM)
+
+ht <- gen_ht_t14_307(adam_adadas)
+
+ht |> huxtable::set_caption("Table 14-3.07 ADAS Cog (11) - Change from Baseline to Week 24 - Completers at Wk 24-Observed Cases-Windowed")
+```
+
+### Table 14-4.01 Summary of Planned Exposure to Study Drug, as of End of Study
+```{r message = FALSE, warning = FALSE}
+library(datarx.pilotADaM)
+
+ht <- gen_ht_t14_401(adam_adsl)
+
+ht |> huxtable::set_caption("Table 14-4.01 Summary of Planned Exposure to Study Drug, as of End of Study")
+```
+

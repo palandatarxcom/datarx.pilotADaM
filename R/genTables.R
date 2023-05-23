@@ -662,3 +662,370 @@ gen_ht_t14_301 <- function(adadas) {
   return(ht)
 }
 
+
+#' gen_ht_t14_302
+#' Generate Table 14-3.02 Primary Endpoint Analysis: CIBIC+ - Summary at Week 24 - LOCF
+#'
+#' @param adcibc
+#'
+#' @return a huxtable
+#' @export
+#'
+#' @examples
+gen_ht_t14_302 <- function(adcibc) {
+  cibc <- adcibc |>
+    filter(EFFFL == "Y" & ITTFL=='Y' & PARAMCD == 'CIBICVAL' & ANL01FL == 'Y')
+
+  # Calculate the header Ns ----
+  header_n <- cibc |>
+    distinct(USUBJID, TRTP, TRTPN) |>
+    get_header_n(TRTP, TRTPN)
+
+  column_headers <- header_n |>
+    select(-N) |>
+    tidyr::pivot_wider(names_from = TRTPN, values_from=labels) |>
+    mutate(rowlbl1 = '')
+
+  # Run each group ----
+  summary_portion <- summary_data(cibc, AVAL, 24, 'Week 24') |>
+    pad_row()
+
+  # Gather the model data ----
+  model_portion <- efficacy_models(cibc, 'AVAL', 24)
+
+  final <- bind_rows(column_headers, summary_portion, model_portion) |>
+    select(rowlbl1, `0`, `54`, `81`)
+
+  # Create the table ----
+  ht <- huxtable::as_hux(final, add_colnames = FALSE) |>
+    huxtable::set_bold(1, 1:ncol(final), TRUE) |>
+    huxtable::set_align(1, 1:ncol(final), 'center') |>
+    huxtable::set_valign(1, 1:ncol(final), 'bottom') |>
+    huxtable::set_bottom_border(1, 1:ncol(final), 1) |>
+    huxtable::set_width(1.2) |>
+    huxtable::set_escape_contents(FALSE) |>
+    huxtable::set_col_width(c(.5, 1/6, 1/6, 1/6))
+
+  return(ht)
+}
+
+
+#' gen_ht_t14_303
+#' Generate Table 14-3.03 ADAS Cog (11) - Change from Baseline to Week 8 - LOCF
+#'
+#' @param adadas
+#'
+#' @return
+#' @export
+#'
+#' @examples
+gen_ht_t14_303 <- function(adadas) {
+  adas <- adadas |>
+    filter(EFFFL == "Y" & ITTFL=='Y' & PARAMCD == 'ACTOT' & ANL01FL == 'Y')
+
+  # Calculate the header Ns ----
+  header_n <- adas |>
+    distinct(USUBJID, TRTP, TRTPN) |>
+    get_header_n(TRTP, TRTPN)
+
+  column_headers <- header_n |>
+    select(-N) |>
+    tidyr::pivot_wider(names_from = TRTPN, values_from=labels) |>
+    mutate(rowlbl1 = '')
+
+  # Run each group ----
+  summary_portion <- bind_rows(summary_data(adas, AVAL, 0, 'Baseline'),
+                               summary_data(adas, AVAL, 8, 'Week 8'),
+                               summary_data(adas, CHG,  8, 'Change from Baseline')) |>
+    pad_row()
+
+  # Gather the model data ----
+  model_portion <- efficacy_models(adas, 'CHG', 8)
+
+  final <- bind_rows(column_headers, summary_portion, model_portion) |>
+    select(rowlbl1, `0`, `54`, `81`)
+
+  # Make the table ----
+  ht <- huxtable::as_hux(final, add_colnames = FALSE) |>
+    huxtable::set_bold(1, 1:ncol(final), TRUE) |>
+    huxtable::set_align(1, 1:ncol(final), 'center') |>
+    huxtable::set_valign(1, 1:ncol(final), 'bottom') |>
+    huxtable::set_bottom_border(1, 1:ncol(final), 1) |>
+    huxtable::set_width(1.2) |>
+    huxtable::set_escape_contents(FALSE) |>
+    huxtable::set_col_width(c(.5, 1/6, 1/6, 1/6))
+
+  return(ht)
+}
+
+
+#' gen_ht_t14_304
+#' Generate Table 14-3.04 CIBIC+ - Summary at Week 8 - LOCF
+#'
+#' @param adcibc
+#'
+#' @return a huxtable
+#' @export
+#'
+#' @examples
+gen_ht_t14_304 <- function(adcibc) {
+  cibc <- adcibc |>
+    filter(EFFFL == "Y" & ITTFL=='Y' & PARAMCD == 'CIBICVAL' & ANL01FL == 'Y')
+
+  # Calculate the header Ns ----
+  header_n <- cibc |>
+    distinct(USUBJID, TRTP, TRTPN) |>
+    get_header_n(TRTP, TRTPN)
+
+  column_headers <- header_n |>
+    select(-N) |>
+    tidyr::pivot_wider(names_from = TRTPN, values_from=labels) |>
+    mutate(rowlbl1 = '')
+
+  # Run each group ----
+  summary_portion <- summary_data(cibc, AVAL, 8, 'Week 8') |>
+    pad_row()
+
+  # Gather the model data ----
+  model_portion <- efficacy_models(cibc, 'AVAL', 8)
+
+  final <- bind_rows(column_headers, summary_portion, model_portion) |>
+    select(rowlbl1, `0`, `54`, `81`)
+
+  # Make the table ----
+  ht <- huxtable::as_hux(final, add_colnames = FALSE) |>
+    huxtable::set_bold(1, 1:ncol(final), TRUE) |>
+    huxtable::set_align(1, 1:ncol(final), 'center') |>
+    huxtable::set_valign(1, 1:ncol(final), 'bottom') |>
+    huxtable::set_bottom_border(1, 1:ncol(final), 1) |>
+    huxtable::set_width(1.2) |>
+    huxtable::set_escape_contents(FALSE) |>
+    huxtable::set_col_width(c(.5, 1/6, 1/6, 1/6))
+
+  return(ht)
+}
+
+
+#' gen_ht_t14_305
+#' Generate Table 14-3.05 ADAS Cog (11) - Change from Baseline to Week 16 - LOCF
+#'
+#' @param adadas
+#'
+#' @return a huxtable
+#' @export
+#'
+#' @examples
+gen_ht_t14_305 <- function(adadas) {
+  adas <- adadas |>
+    filter(EFFFL == "Y" & ITTFL=='Y' & PARAMCD == 'ACTOT' & ANL01FL == 'Y')
+
+  # Calculate the header Ns ----
+  header_n <- adas |>
+    distinct(USUBJID, TRTP, TRTPN) |>
+    get_header_n(TRTP, TRTPN)
+
+  column_headers <- header_n |>
+    select(-N) |>
+    tidyr::pivot_wider(names_from = TRTPN, values_from=labels) |>
+    mutate(rowlbl1 = '')
+
+  # Run each group ----
+  summary_portion <- bind_rows(summary_data(adas, AVAL,  0, 'Baseline'),
+                               summary_data(adas, AVAL, 16, 'Week 16'),
+                               summary_data(adas, CHG,  16, 'Change from Baseline')) |>
+    pad_row()
+
+  # Gather the model data ----
+  model_portion <- efficacy_models(adas, 'CHG', 16)
+
+  final <- bind_rows(column_headers, summary_portion, model_portion) |>
+    select(rowlbl1, `0`, `54`, `81`)
+
+  # Make the table ----
+  ht <- huxtable::as_hux(final, add_colnames = FALSE) |>
+    huxtable::set_bold(1, 1:ncol(final), TRUE) |>
+    huxtable::set_align(1, 1:ncol(final), 'center') |>
+    huxtable::set_valign(1, 1:ncol(final), 'bottom') |>
+    huxtable::set_bottom_border(1, 1:ncol(final), 1) |>
+    huxtable::set_width(1.2) |>
+    huxtable::set_escape_contents(FALSE) |>
+    huxtable::set_col_width(c(.5, 1/6, 1/6, 1/6))
+
+  return(ht)
+}
+
+
+#' gen_ht_t14_306
+#' Generate Table 14-3.06 CIBIC+ - Summary at Week 16 - LOCF
+#'
+#' @param adcibc
+#'
+#' @return a huxtable
+#' @export
+#'
+#' @examples
+gen_ht_t14_306 <- function(adcibc) {
+  cibc <- adcibc |>
+    filter(EFFFL == "Y" & ITTFL=='Y' & PARAMCD == 'CIBICVAL' & ANL01FL == 'Y')
+
+  # Calculate the header Ns ----
+  header_n <- cibc |>
+    distinct(USUBJID, TRTP, TRTPN) |>
+    get_header_n(TRTP, TRTPN)
+
+  column_headers <- header_n |>
+    select(-N) |>
+    tidyr::pivot_wider(names_from = TRTPN, values_from=labels) |>
+    mutate(rowlbl1 = '')
+
+  # Run each group ----
+  summary_portion <- summary_data(cibc, AVAL, 16, 'Week 16') |>
+    pad_row()
+
+  # Gather the model data ----
+  model_portion <- efficacy_models(cibc, 'VAL', 16)
+
+  final <- bind_rows(column_headers, summary_portion, model_portion) |>
+    select(rowlbl1, `0`, `54`, `81`)
+
+  # Make the table ----
+  ht <- huxtable::as_hux(final, add_colnames = FALSE) |>
+    huxtable::set_bold(1, 1:ncol(final), TRUE) |>
+    huxtable::set_align(1, 1:ncol(final), 'center') |>
+    huxtable::set_valign(1, 1:ncol(final), 'bottom') |>
+    huxtable::set_bottom_border(1, 1:ncol(final), 1) |>
+    huxtable::set_width(1.2) |>
+    huxtable::set_escape_contents(FALSE) |>
+    huxtable::set_col_width(c(.5, 1/6, 1/6, 1/6))
+
+  return(ht)
+}
+
+
+#' gen_ht_t14_307
+#' Generate Table 14-3.07 ADAS Cog (11) - Change from Baseline to Week 24 - Completers at Wk 24-Observed Cases-Windowed
+#'
+#' @param adadas
+#'
+#' @return a huxtable
+#' @export
+#'
+#' @examples
+gen_ht_t14_307 <- function(adadas) {
+  adas <- adadas |>
+    filter(COMP24FL == "Y" & EFFFL=='Y' & PARAMCD == 'ACTOT' & ANL01FL == 'Y' & DTYPE != 'LOCF')
+
+  # Calculate the header Ns ----
+  header_n <- adas |>
+    distinct(USUBJID, TRTP, TRTPN) |>
+    get_header_n(TRTP, TRTPN)
+
+  column_headers <- header_n |>
+    select(-N) |>
+    tidyr::pivot_wider(names_from = TRTPN, values_from=labels) |>
+    mutate(rowlbl1 = '')
+
+  # Run each group ----
+  summary_portion <- bind_rows(summary_data(adas, AVAL, 0, 'Baseline'),
+                               summary_data(adas, AVAL, 24, 'Week 24'),
+                               summary_data(adas, CHG,  24, 'Change from Baseline')) |>
+    pad_row()
+
+  # Gather the model data ----
+  model_portion <- efficacy_models(adas, 'CHG', 24)
+
+  final <- bind_rows(column_headers, summary_portion, model_portion) |>
+    select(rowlbl1, `0`, `54`, `81`)
+
+  # Make the table ----
+  ht <- huxtable::as_hux(final, add_colnames = FALSE) |>
+    huxtable::set_bold(1, 1:ncol(final), TRUE) |>
+    huxtable::set_align(1, 1:ncol(final), 'center') |>
+    huxtable::set_valign(1, 1:ncol(final), 'bottom') |>
+    huxtable::set_bottom_border(1, 1:ncol(final), 1) |>
+    huxtable::set_width(1.2) |>
+    huxtable::set_escape_contents(FALSE) |>
+    huxtable::set_col_width(c(.5, 1/6, 1/6, 1/6))
+
+  return(ht)
+}
+
+
+#' gen_ht_t14_401
+#' Generate Table 14-4.01 Summary of Planned Exposure to Study Drug, as of End of Study
+#'
+#' @param adsl
+#'
+#' @return a huxtable
+#' @export
+#'
+#' @examples
+gen_ht_t14_401 <- function(adsl) {
+  # Subset for completers
+  adsl_complt <- adsl |>
+    filter(COMP24FL == 'Y') |>
+    select(TRT01P, TRT01PN, AVGDD, CUMDOSE) |>
+    mutate(cat = 1, TRTPCD = paste(TRT01PN, '_C', sep=''))
+
+  # Subset for safety
+  adsl_safety <- adsl |>
+    filter(SAFFL == 'Y') |>
+    select(TRT01P, TRT01PN, AVGDD, CUMDOSE) |>
+    mutate(cat = 2, TRTPCD = paste(TRT01PN, '_S', sep=''))
+
+  # Stack the two together
+  adsl_ = bind_rows(adsl_safety, adsl_complt)
+  rm(adsl_safety, adsl_complt) # Clean-up
+
+  # Header N counts and column headers
+  header <- adsl_ |>
+    group_by(TRTPCD, TRT01P, TRT01PN, cat) |>
+    summarize(N = n()) |>
+    mutate(
+      labels = str_replace_all(str_wrap(glue('{TRT01P} (N={N})'), width=10), "\n", function(x) "\\line ")
+    ) |>
+    ungroup() |>
+    arrange(cat, TRT01PN) |>
+    select(TRTPCD, labels) |>
+    tidyr::pivot_wider(names_from=TRTPCD, values_from=labels)
+
+  # Calculate average daily dose summary stats ----
+  avgdd <- adsl_ |> desc_stats(AVGDD, group=TRTPCD, int_len=5) |>
+    mutate(rowlbl1 = 'Average daily dose (mg)')
+
+  # Calculate cumulative dose at end of study ----
+  cumdose <- adsl_ |> desc_stats(CUMDOSE, group=TRTPCD, int_len=5) |>
+    mutate(rowlbl1 = 'Cumulative dose at end of study [2]')
+
+  # Spanner - want this to be the top left cell of the cells that will merge
+  spanner <- tibble(`0_C` = 'Completers at Week 24', `0_S` = 'Safety Population [1]')
+
+  # Join it all together, order columns, clean grouped cells
+  final <- bind_rows(spanner, header, avgdd, cumdose) |>
+    select(rowlbl1, rowlbl2, `0_C`, `54_C`, `81_C`, `0_S`, `54_S`, `81_S`) |>
+    group_by(rowlbl1) |>
+    mutate(ord1 = row_number()) |>
+    ungroup() |>
+    mutate(rowlbl1 = ifelse(ord1 == 1, rowlbl1, "")) |>
+    select(-ord1)
+
+  ht <- huxtable::as_hux(final, add_colnames = FALSE) |>
+    huxtable::merge_cells(1, 3:5) |>
+    huxtable::merge_cells(1, 6:8)
+
+  huxtable::bottom_border(ht)[1, 3] <- 1
+  huxtable::bottom_border(ht)[1, 6] <- 1
+  huxtable::bottom_border(ht)[2, ] <- 1
+  huxtable::valign(ht)[1:2, ] <- 'bottom'
+  huxtable::bold(ht)[1:2, ] <- TRUE
+  huxtable::align(ht)[1:2, ] <- 'center'
+  huxtable::width(ht) <- 1.5
+  huxtable::escape_contents(ht) <- FALSE
+  huxtable::col_width(ht) <- c(.36, .07, .1, .11, .11, .1, .11, .11)
+  huxtable::bottom_padding(ht) <- 0
+  huxtable::top_padding(ht) <- 0
+
+  return(ht)
+}
+
+
