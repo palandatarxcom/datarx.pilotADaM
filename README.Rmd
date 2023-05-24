@@ -146,6 +146,63 @@ ht <- gen_ht_t14_307(adam_adadas)
 ht |> huxtable::set_caption("Table 14-3.07 ADAS Cog (11) - Change from Baseline to Week 24 - Completers at Wk 24-Observed Cases-Windowed")
 ```
 
+### Table 14-3.08 ADAS Cog (11) - Change from Baseline to Week 24 in Male Subjects - LOCF
+```{r message = FALSE, warning = FALSE}
+library(datarx.pilotADaM)
+
+ht <- gen_ht_t14_308(adam_adadas)
+
+ht |> huxtable::set_caption("Table 14-3.08 ADAS Cog (11) - Change from Baseline to Week 24 in Male Subjects - LOCF")
+```
+
+
+### Table 14-3.09 ADAS Cog (11) - Change from Baseline to Week 24 in Female Subjects - LOCF
+```{r message = FALSE, warning = FALSE}
+library(datarx.pilotADaM)
+
+ht <- gen_ht_t14_309(adam_adadas)
+
+ht |> huxtable::set_caption("Table 14-3.09 ADAS Cog (11) - Change from Baseline to Week 24 in Female Subjects - LOCF")
+```
+
+
+### Table 14-3.10 ADAS Cog (11) - Mean and Mean Change from Baseline over Time
+```{r message = FALSE, warning = FALSE}
+library(datarx.pilotADaM)
+
+ht <- gen_ht_t14_310(adam_adadas)
+
+ht |> huxtable::set_caption("Table 14-3.10 ADAS Cog (11) - Mean and Mean Change from Baseline over Time")
+```
+
+### Table 14-3.11 ADAS Cog (11) - Repeated Measures Analysis of Change from Baseline to Week 24
+```{r message = FALSE, warning = FALSE}
+library(datarx.pilotADaM)
+
+ht <- gen_ht_t14_311(adam_adadas)
+
+ht |> huxtable::set_caption("Table 14-3.11 ADAS Cog (11) - Repeated Measures Analysis of Change from Baseline to Week 24")
+```
+
+### Table 14-3.12 Mean NPI-X Total Score from Week 4 through Week 24 - Windowed
+```{r message = FALSE, warning = FALSE}
+library(datarx.pilotADaM)
+
+ht <- gen_ht_t14_312(adam_adnpix)
+
+ht |> huxtable::set_caption("Table 14-3.12 Mean NPI-X Total Score from Week 4 through Week 24 - Windowed")
+```
+
+### Table 14-3.13 CIBIC+ - Categorical Analysis - LOCF
+```{r message = FALSE, warning = FALSE}
+library(datarx.pilotADaM)
+
+ht <- gen_ht_t14_313(adam_adcibc)
+
+ht |> huxtable::set_caption("Table 14-3.13 CIBIC+ - Categorical Analysis - LOCF")
+```
+
+
 ### Table 14-4.01 Summary of Planned Exposure to Study Drug, as of End of Study
 ```{r message = FALSE, warning = FALSE}
 library(datarx.pilotADaM)

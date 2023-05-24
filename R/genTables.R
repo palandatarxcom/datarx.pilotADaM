@@ -951,6 +951,448 @@ gen_ht_t14_307 <- function(adadas) {
 }
 
 
+#' gen_ht_t14_308
+#' Generate Table 14-3.08 ADAS Cog (11) - Change from Baseline to Week 24 in Male Subjects - LOCF
+#'
+#' #' @param adadas
+#'
+#' @return a huxtable
+#' @export
+#'
+#' @examples
+gen_ht_t14_308 <- function(adadas) {
+  adas <- adadas |>
+    filter(EFFFL=='Y' & PARAMCD == 'ACTOT' & ANL01FL == 'Y' & SEX == "M")
+
+  # Calculate the header Ns ----
+  header_n <- adas |>
+    distinct(USUBJID, TRTP, TRTPN) |>
+    get_header_n(TRTP, TRTPN)
+
+  column_headers <- header_n |>
+    select(-N) |>
+    pivot_wider(names_from = TRTPN, values_from=labels) |>
+    mutate(rowlbl1 = '')
+
+  # Run each group ----
+  summary_portion <- bind_rows(summary_data(adas, AVAL, 0, 'Baseline'),
+                               summary_data(adas, AVAL, 24, 'Week 24'),
+                               summary_data(adas, CHG,  24, 'Change from Baseline')) |>
+    pad_row()
+
+  # Gather the model data ----
+  model_portion <- efficacy_models(adas, 'CHG', 24)
+
+  final <- bind_rows(column_headers, summary_portion, model_portion) |>
+    select(rowlbl1, `0`, `54`, `81`)
+
+  # Make the table ----
+  ht <- huxtable::as_hux(final, add_colnames = FALSE) |>
+    huxtable::set_bold(1, 1:ncol(final), TRUE) |>
+    huxtable::set_align(1, 1:ncol(final), 'center') |>
+    huxtable::set_valign(1, 1:ncol(final), 'bottom') |>
+    huxtable::set_bottom_border(1, 1:ncol(final), 1) |>
+    huxtable::set_width(1.2) |>
+    huxtable::set_escape_contents(FALSE) |>
+    huxtable::set_col_width(c(.5, 1/6, 1/6, 1/6))
+
+  return(ht)
+}
+
+
+#' gen_ht_t14_309
+#' Generate Table 14-3.09 ADAS Cog (11) - Change from Baseline to Week 24 in Female Subjects - LOCF
+#'
+#' @param adadas
+#'
+#' @return
+#' @export
+#'
+#' @examples
+gen_ht_t14_309 <- function(adadas) {
+  adas <- adadas |>
+    filter(EFFFL == "Y" & PARAMCD == 'ACTOT' & ANL01FL == 'Y' & SEX == "F")
+
+  # Calculate the header Ns ----
+  header_n <- adas |>
+    distinct(USUBJID, TRTP, TRTPN) |>
+    get_header_n(TRTP, TRTPN)
+
+  column_headers <- header_n |>
+    select(-N) |>
+    pivot_wider(names_from = TRTPN, values_from=labels) |>
+    mutate(rowlbl1 = '')
+
+  # Run each group ----
+  summary_portion <- bind_rows(summary_data(adas, AVAL, 0,  'Baseline'),
+                               summary_data(adas, AVAL, 24, 'Week 24'),
+                               summary_data(adas, CHG,  24, 'Change from Baseline')) |>
+    pad_row()
+
+  # Gather the model data ----
+  model_portion <- efficacy_models(adas, 'CHG', 24)
+
+  final <- bind_rows(column_headers, summary_portion, model_portion) |>
+    select(rowlbl1, `0`, `54`, `81`)
+
+  # Make the table ----
+  ht <- huxtable::as_hux(final, add_colnames = FALSE) |>
+    huxtable::set_bold(1, 1:ncol(final), TRUE) |>
+    huxtable::set_align(1, 1:ncol(final), 'center') |>
+    huxtable::set_valign(1, 1:ncol(final), 'bottom') |>
+    huxtable::set_bottom_border(1, 1:ncol(final), 1) |>
+    huxtable::set_width(1.2) |>
+    huxtable::set_escape_contents(FALSE) |>
+    huxtable::set_col_width(c(.5, 1/6, 1/6, 1/6))
+
+  return (ht)
+}
+
+
+#' gen_ht_t14_310
+#' Generate Table 14-3.10 ADAS Cog (11) - Mean and Mean Change from Baseline over Time
+#' @param adadas
+#'
+#' @return a huxtable
+#' @export
+#'
+#' @examples
+gen_ht_t14_310 <- function(adadas) {
+  adas <- adadas |>
+    filter(EFFFL == "Y" & PARAMCD == "ACTOT" & ITTFL == "Y" & AVISITN %in% c(0, 8, 16, 24) & ANL01FL=="Y") |>
+    mutate(SET = "LOCF") |>
+    select(TRTPN, TRTP, AVISIT, AVISITN, AVAL, BASE, CHG, DTYPE, SET)
+
+  # Dataframe to merge display order of visits ----
+  visits <- tibble(
+    ORD = rep(c(1:8), 3),
+    AVISIT = rep(c("Baseline", "Week 8 (Windowed)", "Week 16 (Windowed)", "Week 24 (Windowed)",
+                   "Week 8 LOCF", "Week 16 LOCF", "Week 24 LOCF", ''), 3),
+    TRTPN = c(rep(c(0), 8), rep(54, 8), rep(81, 8))
+  )
+
+  # Join the LOCF and Windowed sets together ----
+  step1 <- adas |>
+    bind_rows(adas |>
+                filter(AVISITN != 0 & DTYPE != 'LOCF') |>
+                mutate(SET="WINDOWED")
+    ) |>
+
+    mutate(
+      # Format AVISIT for display
+      AVISIT =
+        case_when(
+          SET == 'WINDOWED' & AVISITN != 0 ~ paste(AVISIT, '(Windowed)'),
+          SET == 'LOCF' & AVISITN != 0 ~ paste(AVISIT, 'LOCF'),
+          TRUE ~ AVISIT
+        ),
+      # Display of TRTP
+      TRTP =
+        case_when(
+          TRTPN == 0 ~ 'Placebo',
+          TRTPN == 54 ~ 'Xan.Low',
+          TRTPN == 81 ~ 'Xan.High'
+        )
+    )
+
+  # Get all summaries for aval ----
+  aval <- step1 |>
+    group_by(TRTPN, TRTP, AVISITN, AVISIT, SET) |>
+    summarize(
+      n = num_fmt(n(), int_len=2, size=2),
+      mean = num_fmt(mean(AVAL), digits=1, int_len=2, size=4),
+      sd = num_fmt(sd(AVAL), digits=2, int_len=2, size=5),
+      md = num_fmt(median(AVAL), digits=1, int_len=2, size=4),
+      mn = num_fmt(min(AVAL), int_len=2, size=4),
+      mx = num_fmt(max(AVAL), int_len=2, size=4),
+    ) |>
+    full_join(visits, by=c("TRTPN", "AVISIT"))
+
+  # Get all summaries for chg ----
+  chg <- step1 |>
+    group_by(TRTPN, TRTP, AVISITN, AVISIT, SET) |>
+    filter(AVISITN != 0) |>
+    summarize(
+      meanc = num_fmt(mean(CHG), digits=1, int_len=1, size=4),
+      sdc = num_fmt(sd(CHG), digits=2, int_len=1, size=4),
+      mdc = num_fmt(median(CHG), digits=1, int_len=1, size=4),
+      mnc = num_fmt(min(CHG), int_len=3, size=4),
+      mxc = num_fmt(max(CHG), int_len=2, size=4),
+      bmn = num_fmt(mean(BASE), digits=1, int_len=2, size=4),
+      bsd = num_fmt(sd(BASE), digits=2, int_len=2, size=5)
+    )
+
+  # Join to AVAL and CHG results together to create final table ----
+  final <- left_join(aval, chg, by=c('TRTPN', 'TRTP', 'AVISITN', 'AVISIT', 'SET')) |>
+    arrange(TRTPN, ORD) |>
+    ungroup() |>
+    mutate(TRTP = ifelse(ORD==1, TRTP, '')) |>
+    select(TRTP, AVISIT, n, mean, sd, md, mn, mx, bmn, bsd, meanc, sdc, mdc, mnc, mxc)
+
+  # Create the column headers
+  header <- tibble(
+    TRTP=character(2),
+    AVISIT=character(2),
+    n=c('', 'nc'),
+    mean=c('', 'Mean'),
+    sd=c('', 'Std'),
+    md=c('', 'Med.'),
+    mn=c('', 'Min.'),
+    mx=c('', 'Max.'),
+    bmn=c('', 'Bsln\\line Mean'),
+    bsd=c('', 'Bsln\\line Std'),
+    meanc=c('---Change from baseline---', 'Mean'),
+    sdc=c('', 'Std'),
+    mdc=c('', 'Med.'),
+    mnc=c('', 'Min.'),
+    mxc=c('', 'Max.')
+  )
+
+  # Make the table
+  ht <- huxtable::as_hux(bind_rows(header, final), add_colnames = FALSE) |>
+    huxtable::merge_cells(1, 11:15) |> # Span header for Change from Baseline
+    huxtable::set_bold(1:2, 1:ncol(final), TRUE) |> # Bold the header
+    huxtable::set_align(1:2, 1:ncol(final), 'center') |> # Align the header
+    huxtable::set_align(1:(nrow(final) +2), 3:ncol(final), 'center') |> # Center all of the numeric cells
+    huxtable::set_valign(1:2, 1:ncol(final), 'bottom') |> # Attach the column headers to the bottom of the cell
+    huxtable::set_bottom_border(2, 1:ncol(final), 1) |> # Bottom border under column header
+    huxtable::set_width(1.5) |> # Take up the whole width of the page
+    huxtable::set_escape_contents(FALSE) |> # Allow RTF strings
+    huxtable::set_col_width(c(.09, .19, .05, .06, .06, .06, .05, .05, .06, .06, .06, .05, .05, .05, .06)) # Column widths as a ratio
+
+  return(ht)
+}
+
+
+#' gen_ht_t14_311
+#'
+#' @param adadas
+#' Generate Table 14-3.11 ADAS Cog (11) - Repeated Measures Analysis of Change from Baseline to Week 24
+#'
+#' @return
+#' @export
+#'
+#' @examples
+gen_ht_t14_311 <- function(adadas) {
+  adas <- adadas |>
+    filter(EFFFL == "Y" & PARAMCD == 'ACTOT' & ANL01FL == 'Y' & DTYPE != 'LOCF' & AVISITN > 0)
+
+  # Calculate the header Ns ----
+  header_n <- adas |>
+    distinct(USUBJID, TRTP, TRTPN) |>
+    get_header_n(TRTP, TRTPN)
+
+  column_headers <- header_n |>
+    select(-N) |>
+    tidyr::pivot_wider(names_from = TRTPN, values_from=labels) |>
+    mutate(rowlbl1 = '')
+
+  # Gather the model data ----
+  model_portion <- efficacy_models(adas, 'CHG', 24, model_type='repeated')
+
+  final <- bind_rows(column_headers, model_portion) |>
+    select(rowlbl1, `0`, `54`, `81`)
+
+  # Take off footnote references ----
+  final[4,1] <- "p-value(Xan - Placebo)"
+  final[8,1] <- "p-value(Xan High - Xan Low)"
+
+  # Make the table ----
+  ht <- huxtable::as_hux(final, add_colnames = FALSE) |>
+    huxtable::set_bold(1, 1:ncol(final), TRUE) |>
+    huxtable::set_align(1, 1:ncol(final), 'center') |>
+    huxtable::set_valign(1, 1:ncol(final), 'bottom') |>
+    huxtable::set_bottom_border(1, 1:ncol(final), 1) |>
+    huxtable::set_width(1.2) |>
+    huxtable::set_escape_contents(FALSE) |>
+    huxtable::set_col_width(c(.5, 1/6, 1/6, 1/6))
+
+  return(ht)
+}
+
+
+#' gen_ht_t14_312
+#' Generate Table 14-3.12 Mean NPI-X Total Score from Week 4 through Week 24 - Windowed
+#'
+#' @param adnpix
+#'
+#' @return a huxtable
+#' @export
+#'
+#' @examples
+gen_ht_t14_312 <- function(adnpix) {
+  npix <- adnpix %>%
+    filter(EFFFL == 'Y' & ITTFL == 'Y' & PARAMCD == 'NPTOTMN') %>%
+    mutate(CHG = AVAL - BASE)
+
+  # Calculate the header Ns ----
+  header_n <- npix %>%
+    distinct(USUBJID, TRTP, TRTPN) %>%
+    get_header_n(TRTP, TRTPN)
+
+  column_headers <- header_n %>%
+    select(-N) %>%
+    pivot_wider(names_from = TRTPN, values_from=labels) %>%
+    mutate(rowlbl1 = '')
+
+  summary_portion <- bind_rows(summary_data(npix, AVAL, 0 , 'Baseline'),
+                               summary_data(npix, AVAL,  98, 'Mean of Weeks 4-24')) %>%
+    pad_row()
+
+  # Gather the model data ----
+  model_portion <- efficacy_models(npix, 'CHG', 98)
+
+  final <- bind_rows(column_headers, summary_portion, model_portion) %>%
+    select(rowlbl1, `0`, `54`, `81`)
+
+  # Create the table ----
+  ht <- huxtable::as_hux(final, add_colnames = FALSE) %>%
+    huxtable::set_bold(1, 1:ncol(final), TRUE) %>%
+    huxtable::set_align(1, 1:ncol(final), 'center') %>%
+    huxtable::set_valign(1, 1:ncol(final), 'bottom') %>%
+    huxtable::set_bottom_border(1, 1:ncol(final), 1) %>%
+    huxtable::set_width(1.2) %>%
+    huxtable::set_escape_contents(FALSE) %>%
+    huxtable::set_col_width(c(.5, 1/6, 1/6, 1/6))
+
+  return(ht)
+}
+
+
+#' gen_ht_t14_313
+#' Generate Table 14-3.13 CIBIC+ - Categorical Analysis - LOCF
+#'
+#' @param adadcibc
+#'
+#' @return a huxtable
+#' @export
+#'
+#' @examples
+gen_ht_t14_313 <- function(adadcibc) {
+  ord <- tibble(
+    AVALC = rep(c('n',
+                  'Marked improvement',
+                  'Moderate improvement',
+                  'Minimal improvement',
+                  'No Change',
+                  'Minimal worsening',
+                  'Moderate worsening',
+                  'Marked worsening', ''),3),
+    ord = rep(c(0:8),3),
+    AVISITN = c(rep(8, 9), rep(16,9), rep(24,9)),
+    AVISIT = c(rep('Week 8', 9), rep('Week 16', 9), rep('Week 24', 9))
+  )
+
+  # Read in the CBIC dataset ----
+  cbic <- adadcibc |>
+    filter(EFFFL == 'Y' & ITTFL == 'Y', AVISITN %in% c(8, 16, 24) & ANL01FL=='Y') |>
+    # Create a character version of AVAL for display
+    mutate(
+      AVALC = ord[2:8, ]$AVALC[AVAL], # The codelist is already in this dataframe so using that
+    )
+
+  # Calculate the header Ns ----
+  header_n <- cbic |>
+    distinct(USUBJID, TRTP, TRTPN) |>
+    get_header_n(TRTP, TRTPN)
+
+  column_headers <- header_n |>
+    select(-N) |>
+    pivot_wider(names_from = TRTPN, values_from=labels) |>
+    mutate(AVISIT = '',
+           AVALC = 'Assessment',
+           p = 'p-value\\line [1]')
+
+  # Get the summary N counts for each group ----
+  ns <- cbic |>
+    group_by(TRTPN, AVISITN, AVISIT) |>
+    summarize(N = n()) |>
+    ungroup()
+
+  counts <- cbic |>
+    # Summarize the categorical counts
+    group_by(TRTPN, AVISITN, AVISIT, AVALC) |>
+    summarize(n = n()) |>
+    ungroup() |>
+    # Merge in the group N's for summary
+    merge(ns, by=c('TRTPN', 'AVISITN', 'AVISIT', 'AVISIT')) |>
+    rowwise() |>
+    # Format the n (%)
+    mutate(npct=n_pct(n, N, n_width=2)) |>
+    select(-n, -N) |>
+    # Transpose out by treatment group
+    tidyr::pivot_wider(names_from = TRTPN, values_from=npct) |>
+    # Bind with the N rows
+    bind_rows(
+      # Need for tranpose and format
+      ns |>
+        rowwise() |>
+        # Format the N counts and add the row label
+        mutate(
+          AVALC = 'n',
+          Nc = num_fmt(N, size=9, int_len=2)
+        ) |>
+        select(-N) |>
+        # Transpose out by group
+        tidyr::pivot_wider(names_from = TRTPN, values_from=Nc)
+    ) |>
+    # Join to add 0's
+    full_join(
+      ord, by=c('AVISITN', 'AVISIT', 'AVALC')
+    ) |>
+    # Fill the 0s
+    ## There is a bug here that causes vctrs to fail.
+    tidyr::replace_na(list(`0`=' 0       ', `54` = ' 0       ', `81`=' 0       ')) |>
+    # Clean up the rows that should be blank
+    mutate(
+      `0` = ifelse(AVALC=='', '', `0`),
+      `54` = ifelse(AVALC=='', '', `54`),
+      `81` = ifelse(AVALC=='', '', `81`),
+      AVISIT = ifelse(ord==0, AVISIT, '')
+    ) |>
+    # Sort
+    arrange(AVISITN, ord)
+
+
+  # P-values ----
+  # !!! NOTE: To obtain the same p-value used in SAS for this display, a modification had to be made to the vcdExtra library.
+  #           Please refer to this github issue: https://github.com/friendly/vcdExtra/issues/3
+  #           And you can access our fork of the library here: https://github.com/mstackhouse/vcdExtra
+  counts['p'] <- character(nrow(counts))
+
+  counts[(counts$AVISITN==8 & counts$ord==0),'p'] <- cbic |>
+    filter(AVISITN == 8) |>
+    cmh_p(AVAL ~ TRTP | SITEGR1) |>
+    num_fmt(digits=4, size=5, int_len=1)
+
+  counts[(counts$AVISITN==16 & counts$ord==0),'p']  <- cbic |>
+    filter(AVISITN == 16) |>
+    cmh_p(AVAL ~ TRTP | SITEGR1) |>
+    num_fmt(digits=4, size=5, int_len=1)
+
+  counts[(counts$AVISITN==24 & counts$ord==0),'p'] <- cbic |>
+    filter(AVISITN == 24) |>
+    cmh_p(AVAL ~ TRTP | SITEGR1) |>
+    num_fmt(digits=4, size=5, int_len=1)
+
+  final <- bind_rows(column_headers, counts) |>
+    select(AVISIT, AVALC, `0`,`54`,`81`, p)
+
+  # Make the table ----
+  ht <- huxtable::as_hux(final, add_colnames = FALSE) |>
+    huxtable::set_bold(1, 1:ncol(final), TRUE) |>
+    huxtable::set_align(1, 1:ncol(final), 'center') |>
+    huxtable::set_align(1,2, 'left') |>
+    huxtable::set_valign(1, 1:ncol(final), 'bottom') |>
+    huxtable::set_bottom_border(1, 1:ncol(final), 1) |>
+    huxtable::set_width(1.2) |>
+    huxtable::set_escape_contents(FALSE) |>
+    huxtable::set_col_width(c(1/8, 3/8, 1/8, 1/8, 1/8, 1/8))
+
+  return(ht)
+}
+
+
 #' gen_ht_t14_401
 #' Generate Table 14-4.01 Summary of Planned Exposure to Study Drug, as of End of Study
 #'
