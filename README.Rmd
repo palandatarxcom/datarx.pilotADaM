@@ -212,3 +212,50 @@ ht <- gen_ht_t14_401(adam_adsl)
 ht |> huxtable::set_caption("Table 14-4.01 Summary of Planned Exposure to Study Drug, as of End of Study")
 ```
 
+### Table 14-5.01 Incidence of Treatment Emergent Adverse Events by Treatment Group
+```{r message = FALSE, warning = FALSE}
+library(datarx.pilotADaM)
+
+ht <- gen_ht_t14_501(adam_adae, adam_adsl)
+
+ht |> huxtable::set_caption("Table 14-5.01 Incidence of Treatment Emergent Adverse Events by Treatment Group")
+```
+
+### Table 14-5.02 Incidence of Treatment Emergent Serious Adverse Events by Treatment Group
+```{r message = FALSE, warning = FALSE}
+library(datarx.pilotADaM)
+
+ht <- gen_ht_t14_502(adam_adae, adam_adsl)
+
+ht |> huxtable::set_caption("Table 14-5.02 Incidence of Treatment Emergent Serious Adverse Events by Treatment Group")
+```
+
+
+### Table 14-7.01 Summary of Vital Signs at Baseline and End of Treatment
+```{r message = FALSE, warning = FALSE}
+library(datarx.pilotADaM)
+
+ht <- gen_ht_t14_701(adam_adsl, adam_advs)
+
+ht |> huxtable::set_caption("Table 14-7.01 Summary of Vital Signs at Baseline and End of Treatment")
+```
+
+### Table 14-7.02 Summary of Vital Signs Change from Baseline at End of Treatment
+```{r message = FALSE, warning = FALSE}
+library(datarx.pilotADaM)
+
+ht <- gen_ht_t14_702(adam_adsl, adam_advs)
+
+ht |> huxtable::set_caption("Table 14-7.02 Summary of Vital Signs Change from Baseline at End of Treatment")
+```
+
+### Table 14-7.04 Summary of Concomitant Medications (Number of Subjects)
+```{r message = FALSE, warning = FALSE}
+library(datarx.pilotADaM)
+
+ht <- gen_ht_t14_704(sdtm_cm, adam_adsl)
+
+ht |> huxtable::set_caption("Table 14-7.04 Summary of Concomitant Medications (Number of Subjects)")
+```
+
+

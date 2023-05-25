@@ -59,15 +59,15 @@ gen_ht_t14_101 <- function(adsl) {
     select(rowlbl1, `0`, `54`, `81`, `99`)
 
   # Make the table
-  ht <- as_hux(final, add_colnames = FALSE) |>
-    set_bold(1, 1:ncol(final), TRUE) |>
-    set_align(1, 1:ncol(final), 'center') |>
-    set_valign(1, 1:ncol(final), 'bottom') |>
-    set_bottom_border(1, 1:ncol(final), 1) |>
-    set_width(1.1) |>
-    set_escape_contents(FALSE) |>
-    set_col_width(c(.4, .15, .15, .15, .15)) |>
-    set_wrap(TRUE)
+  ht <- huxtable::as_hux(final, add_colnames = FALSE) |>
+    huxtable::set_bold(1, 1:ncol(final), TRUE) |>
+    huxtable::set_align(1, 1:ncol(final), 'center') |>
+    huxtable::set_valign(1, 1:ncol(final), 'bottom') |>
+    huxtable::set_bottom_border(1, 1:ncol(final), 1) |>
+    huxtable::set_width(1.1) |>
+    huxtable::set_escape_contents(FALSE) |>
+    huxtable::set_col_width(c(.4, .15, .15, .15, .15)) |>
+    huxtable::set_wrap(TRUE)
 }
 
 
@@ -374,26 +374,26 @@ gen_ht_t14_103 <- function(adsl) {
   df[1, 12] <- headers[4, "labels"]
 
   ht <- df |>
-    as_hux(add_colnames=FALSE) |>
-    merge_cells(1, 3:5) |>
-    set_bottom_border(2, 3:5, 1) |>
-    merge_cells(1, 6:8) |>
-    set_bottom_border(2, 6:8, 1) |>
-    merge_cells(1, 9:11) |>
-    set_bottom_border(2, 9:11, 1) |>
-    merge_cells(1, 12:14) |>
-    set_bottom_border(2, 12:14, 1) |>
-    set_escape_contents(FALSE) |>
-    set_width(1.1) |>
-    set_bottom_border(3, 1:14, 1) |>
-    set_align(3, 1:14, "center") |>
-    set_valign(3, 1:14, "bottom") |>
-    set_align(4:nrow(df), 3:ncol(df), "right") |>
-    set_align(1:nrow(df), 1:2, "center") |>
-    set_align(1, 1:14, "center") |>
-    set_valign(1, 1:14, "bottom") |>
-    set_col_width(1:ncol(df), value = c(0.1, 0.1, rep(0.07, 12))) |>
-    set_wrap(FALSE)
+    huxtable::as_hux(add_colnames=FALSE) |>
+    huxtable::merge_cells(1, 3:5) |>
+    huxtable::set_bottom_border(2, 3:5, 1) |>
+    huxtable::merge_cells(1, 6:8) |>
+    huxtable::set_bottom_border(2, 6:8, 1) |>
+    huxtable::merge_cells(1, 9:11) |>
+    huxtable::set_bottom_border(2, 9:11, 1) |>
+    huxtable::merge_cells(1, 12:14) |>
+    huxtable::set_bottom_border(2, 12:14, 1) |>
+    huxtable::set_escape_contents(FALSE) |>
+    huxtable::set_width(1.1) |>
+    huxtable::set_bottom_border(3, 1:14, 1) |>
+    huxtable::set_align(3, 1:14, "center") |>
+    huxtable::set_valign(3, 1:14, "bottom") |>
+    huxtable::set_align(4:nrow(df), 3:ncol(df), "right") |>
+    huxtable::set_align(1:nrow(df), 1:2, "center") |>
+    huxtable::set_align(1, 1:14, "center") |>
+    huxtable::set_valign(1, 1:14, "bottom") |>
+    huxtable::set_col_width(1:ncol(df), value = c(0.1, 0.1, rep(0.07, 12))) |>
+    huxtable::set_wrap(FALSE)
 }
 
 
@@ -587,7 +587,7 @@ gen_ht_t14_201 <- function(adsl) {
 
   # Make and attach column headers
   header_n_v <- header_n |> select(TRT01PN, labels) |>
-    pivot_wider(names_from = TRT01PN, values_from = labels) |>
+    tidyr::pivot_wider(names_from = TRT01PN, values_from = labels) |>
     mutate(
       rowlbl1 = '',
       rowlbl2 = '',
@@ -1471,3 +1471,677 @@ gen_ht_t14_401 <- function(adsl) {
 }
 
 
+#' gen_ht_t14_501
+#' Generate Table 14-5.01 Incidence of Treatment Emergent Adverse Events by Treatment Group
+#'
+#' @param adae
+#' @param adsl
+#'
+#' @return a huxtable
+#' @export
+#'
+#' @examples
+gen_ht_t14_501 <- function(adae, adsl) {
+  adae <- adae |>
+    filter(SAFFL == 'Y' & TRTEMFL == 'Y')
+
+  # Header N ----
+  header_n <- adsl |>
+    get_header_n()
+
+  # Overall counts ----
+  overall <- ae_counts(adae, N_counts = header_n) |>
+    mutate(AETERM = 'ANY BODY SYSTEM', AEBODSYS = 'ANY BODY SYSTEM', ord1=1, ord2=1)
+
+  # System Organ Class counts ----
+  bodsys <- ae_counts(adae, AEBODSYS, N_counts = header_n) |>
+    mutate(AETERM = AEBODSYS, ord1=2, ord2=1) |>
+    arrange(AEBODSYS)
+
+  pad <- bodsys |>
+    select(AEBODSYS, ord1, ord2) |>
+    mutate(ord3=999)
+
+  # Individual term counts
+  term <- ae_counts(adae, AEBODSYS, AETERM, sort=TRUE, N_counts = header_n) |>
+    mutate(AETERM = paste0('  ', AETERM), ord1=2, ord2=2)
+
+  # Bring the data together
+  combined <- bind_rows(overall, bodsys, pad, term) |>
+    arrange(ord1, AEBODSYS, ord2, desc(ord3), AETERM)
+
+  # Build and attach column headers
+  column_headers <- header_n |>
+    select(-N) |>
+    tidyr::pivot_wider(names_from = TRT01PN, values_from = labels) |>
+    select(npct_0 = `0`, npct_54 = `54`, npct_81 = `81`) |>
+    mutate(cAEs_0 = '',
+           cAEs_54 = '',
+           cAEs_81 = '',
+           AETERM = '',
+           p_low = "Fisher's Exact\\line p-values",
+           p_high = '')
+
+  # Insert second row of header
+  column_headers <- bind_rows(column_headers, tibble(
+    AETERM = 'System Organ Class/\\line Preferred Term',
+    npct_0 = 'n(%)',
+    cAEs_0 = '[AEs]',
+    npct_54 = 'n(%)',
+    cAEs_54 = '[AEs]',
+    npct_81 = 'n(%)',
+    cAEs_81 = '[AEs]',
+    p_low = 'Placebo\\line vs.\\line Low Dose',
+    p_high = 'Placebo\\line vs.\\line High Dose'
+  ))
+
+  # Attach to final
+  final <- bind_rows(column_headers, combined) |>
+    select(AETERM, npct_0, cAEs_0, npct_54, cAEs_54, npct_81, cAEs_81, p_low, p_high)
+
+
+  # Make the table ----
+
+  ht <- huxtable::as_hux(final, add_colnames = FALSE) |>
+        huxtable::merge_cells(1, 2:3) |>
+        huxtable::merge_cells(1, 4:5) |>
+        huxtable::merge_cells(1, 6:7) |>
+        huxtable::merge_cells(1, 8:9)
+
+  huxtable::bottom_border(ht)[2, ] <- 1
+  huxtable::valign(ht)[1:2, ] <- 'bottom'
+  huxtable::bold(ht)[1:2, ] <- TRUE
+  huxtable::align(ht)[1:2, ] <- 'center'
+  huxtable::width(ht) <- 1.5
+  huxtable::escape_contents(ht) <- FALSE
+  huxtable::col_width(ht) <- c(.3, .1, .07, .1, .07, .1, .07, .09, .1)
+  huxtable::bottom_padding(ht) <- 0
+  huxtable::top_padding(ht) <- 0
+
+  return(ht)
+}
+
+
+#' gen_ht_t14_502
+#' Generate Table 14-5.02 Incidence of Treatment Emergent Serious Adverse Events by Treatment Group
+#'
+#' @param adae
+#' @param adsl
+#'
+#' @return a huxtable
+#' @export
+#'
+#' @examples
+gen_ht_t14_502 <- function(adae, adsl) {
+  adae <- adae |>
+    filter(SAFFL == 'Y' & TRTEMFL == 'Y' & AESER == 'Y')
+
+  # Header N ----
+  header_n <- adsl |>
+    get_header_n()
+
+  # Overall counts
+  overall <- ae_counts(adae, N_counts = header_n) |>
+    mutate(AETERM = 'ANY BODY SYSTEM', AEBODSYS = 'ANY BODY SYSTEM', ord1=1, ord2=1)
+
+  # System Organ Class counts
+  bodsys <- ae_counts(adae, AEBODSYS, N_counts = header_n) |>
+    mutate(AETERM = AEBODSYS, ord1=2, ord2=1) |>
+    arrange(AEBODSYS)
+
+  pad <- bodsys |>
+    select(AEBODSYS, ord1, ord2) |>
+    mutate(ord3=999)
+
+  # Individual term counts
+  term <- ae_counts(adae, AEBODSYS, AETERM, sort = TRUE, N_counts = header_n) |>
+    mutate(AETERM = paste0('  ', AETERM), ord1=2, ord2=2)
+
+  # Bring the data together
+  combined <- bind_rows(overall, bodsys, pad, term) |>
+    arrange(ord1, AEBODSYS, ord2, desc(ord3), AETERM)
+
+  # Build and attach column headers
+  column_headers <- header_n |>
+    select(-N) |>
+    tidyr::pivot_wider(names_from = TRT01PN, values_from=labels) |>
+    select(npct_0=`0`, npct_54=`54`, npct_81=`81`) |>
+    mutate(cAEs_0 = '',
+           cAEs_54 = '',
+           cAEs_81 = '',
+           AETERM = '',
+           p_low = "Fisher's Exact\\line p-values",
+           p_high = '')
+
+  # Insert second row of header
+  column_headers <- bind_rows(column_headers, tibble(
+    AETERM = 'System Organ Class/\\line Preferred Term',
+    npct_0 = 'n(%)',
+    cAEs_0 = '[AEs]',
+    npct_54 = 'n(%)',
+    cAEs_54 = '[AEs]',
+    npct_81 = 'n(%)',
+    cAEs_81 = '[AEs]',
+    p_low = 'Placebo\\line vs.\\line Low Dose',
+    p_high = 'Placebo\\line vs.\\line High Dose'
+  ))
+
+  # Attach to final
+  final <- bind_rows(column_headers, combined) |>
+    select(AETERM, npct_0, cAEs_0, npct_54, cAEs_54, npct_81, cAEs_81, p_low, p_high)
+
+  # Make the table ----
+
+  ht <- huxtable::as_hux(final) |>
+    huxtable::merge_cells(1, 2:3) |>
+    huxtable::merge_cells(1, 4:5) |>
+    huxtable::merge_cells(1, 6:7) |>
+    huxtable::merge_cells(1, 8:9)
+
+  huxtable::bottom_border(ht)[2, ] <- 1
+  huxtable::valign(ht)[1:2, ] <- 'bottom'
+  huxtable::bold(ht)[1:2, ] <- TRUE
+  huxtable::align(ht)[1:2, ] <- 'center'
+  huxtable::width(ht) <- 1.5
+  huxtable::escape_contents(ht) <- FALSE
+  huxtable::col_width(ht) <- c(.3, .1, .07, .1, .07, .1, .07, .09, .1)
+  huxtable::bottom_padding(ht) <- 0
+  huxtable::top_padding(ht) <- 0
+
+  return(ht)
+}
+
+
+#' gen_ht_t14_701
+#' Generate Table 14-7.01 Summary of Vital Signs at Baseline and End of Treatment
+#'
+#' @param adsl
+#' @param advs
+#'
+#' @return
+#' @export
+#'
+#' @examples
+gen_ht_t14_701 <- function(adsl, advs) {
+  advs <- advs |>
+    filter(SAFFL == "Y", ANL01FL == "Y")
+
+  advs$EOTFL <- ifelse(advs[, "AVISIT"] == "End of Treatment", "Y", "")
+  advs$W24FL <- ifelse(advs[, "AVISIT"] == "Week 24", "Y", "")
+
+  advs2 <- advs |>
+    filter(EOTFL == "Y" | W24FL == "Y" | ABLFL == "Y") |>
+    filter(PARAM %in% c("Diastolic Blood Pressure (mmHg)",
+                        "Pulse Rate (beats/min)",
+                        "Systolic Blood Pressure (mmHg)"))
+
+
+  advs2$TRTP <- ordered(advs2$TRTP, c("Placebo", "Xanomeline Low Dose", "Xanomeline High Dose"))
+  ## Add ordered VISITS to order visits
+  advs2$AVISIT <- ordered(advs2$AVISIT, c("Baseline", "Week 24", "End of Treatment"))
+  advs2$PARAM <- recode(advs2$PARAM,
+                        "Pulse Rate (beats/min)" = "Pulse (bpm)")
+  advs2$PARAM <- ordered(advs2$PARAM, c("Systolic Blood Pressure (mmHg)",
+                                        "Diastolic Blood Pressure (mmHg)",
+                                        "Pulse (bpm)"))
+
+  advs_bl <- advs2 |>
+    filter(ABLFL == "Y") |>
+    group_by(PARAM, ATPT, TRTP) |>
+    summarise(n = n(),
+              mean = mean(AVAL),
+              sd = sd(AVAL),
+              median = median(AVAL),
+              min = min(AVAL),
+              max = max(AVAL))
+
+  advs_w24 <- advs2 |>
+    filter(W24FL == "Y") |>
+    group_by(PARAM, ATPT, TRTP) |>
+    summarise(n = n(),
+              mean = mean(AVAL),
+              sd = sd(AVAL),
+              median = median(AVAL),
+              min = min(AVAL),
+              max = max(AVAL))
+
+  advs_eot <- advs2 |>
+    filter(EOTFL == "Y", !is.na(AVAL)) |>
+    group_by(PARAM, ATPT, TRTP) |>
+    summarise(n = n(),
+              mean = mean(AVAL),
+              sd = sd(AVAL),
+              median = median(AVAL),
+              min = min(AVAL),
+              max = max(AVAL))
+
+  advs3 <- rbind(advs_bl, advs_w24, advs_eot) |>
+    arrange(PARAM, ATPT, TRTP) |>
+    add_column("PRTFL" = rep(c("Baseline", "Week 24", "End of Trt."), 27), .before = 4)
+
+
+  advs4 <- add_column(advs3, "N" = apply(advs3,
+                                         1,
+                                         function(x) {aSum <- sum(adsl[,"ARM"] == x["TRTP"], na.rm = TRUE)
+                                         ifelse(aSum == 0, NA, aSum)}),
+                      .after = 3)
+
+  advs4[!(advs4$PRTFL %in% "Baseline"), "TRTP"] <- NA
+  advs4[!(advs4$TRTP %in% "Placebo"), "ATPT"] <- NA
+  advs4[!(advs4$ATPT %in% "AFTER LYING DOWN FOR 5 MINUTES"), "PARAM"] <- NA
+  advs4[!(advs4$PRTFL %in% "Baseline"), "N"] <- NA
+
+
+
+  advs4$TRTP <- apply(advs4, 1, function(x) {switch(x["TRTP"],
+                                                    "Placebo" = "Placebo",
+                                                    "Xanomeline High Dose" = "Xan.High",
+                                                    "Xanomeline Low Dose" = "Xan.Low",
+                                                    NA)})
+
+  advs4$mean <- num_fmt(advs4$mean, digits = 1, size = 4)
+  advs4$sd <- num_fmt(advs4$sd, digits = 2, size = 5, int_len = 2)
+  advs4$median <- num_fmt(advs4$median, digits = 1, size = 4, int_len = 3)
+  advs4$min <- num_fmt(advs4$min, digits = 1, size = 4, int_len = 3)
+  advs4$max <- num_fmt(advs4$max, digits = 1, size = 4, int_len = 3)
+
+
+  names(advs4) <- c(
+    "Measure",
+    "Position",
+    "Treatment",
+    "N",
+    "Planned Relative Time",
+    "n",
+    "Mean",
+    "SD",
+    "Median",
+    "Min.",
+    "Max."
+  )
+
+  advs4 <- pad_row2(advs4, which(advs4[, "Planned Relative Time"] == "End of Trt.") + 1)
+
+  ht <- advs4 |>
+    huxtable::as_hux(add_colnames=TRUE) |>
+    huxtable::set_bold(1, 1:ncol(advs4), TRUE) |>
+    huxtable::set_align(1, 1:ncol(advs4), "center") |>
+    huxtable::set_align(2:nrow(advs4), 3, "center") |>
+    huxtable::set_align(2:nrow(advs4), 4:ncol(advs4), "left") |>
+    huxtable::set_valign(1, 1:ncol(advs4), "bottom") |>
+    huxtable::set_bottom_border(1, 1:ncol(advs4), 1) |>
+    huxtable::set_width(1.45) |>
+    huxtable::set_col_width(1:ncol(advs4), c(0.2, 0.15, 0.19, 0.03, 0.1, 0.03, 0.06, 0.06, 0.06, 0.06, 0.06))
+
+  return(ht)
+}
+
+#' gen_ht_t14_702
+#' Generate Table 14-7.02 Summary of Vital Signs Change from Baseline at End of Treatment
+#'
+#' @param adsl
+#' @param advs
+#'
+#' @return
+#' @export
+#'
+#' @examples
+gen_ht_t14_702 <- function(adsl, advs) {
+  advs <- advs |>
+    filter(SAFFL == "Y" & !is.na(BASE))
+
+  advs$EOTFL <- ifelse(advs[,"AVISIT"] == "End of Treatment", "Y", "")
+  advs$W24FL <- ifelse(advs[, "AVISIT"] == "Week 24", "Y", "")
+
+  advs2 <- advs |>
+    filter(EOTFL == "Y" | W24FL == "Y") |>
+    filter(PARAM %in% c("Diastolic Blood Pressure (mmHg)",
+                        "Pulse Rate (beats/min)",
+                        "Systolic Blood Pressure (mmHg)"))
+
+  advs2$PRTFL <- ifelse(advs2[,"EOTFL"] == "Y", "End of Trt.","Week 24")
+
+  advs2$TRTP <- ordered(advs2$TRTP, c("Placebo", "Xanomeline Low Dose", "Xanomeline High Dose"))
+  ## Add ordered VISITS to order visits
+  advs2$AVISIT <- ordered(advs2$AVISIT, c("Baseline", "Week 24", "End of Treatment"))
+  advs2$PRTFL <- ordered(advs2$PRTFL, c("Week 24", "End of Trt."))
+  advs2$PARAM <- recode(advs2$PARAM,
+                        "Pulse Rate (beats/min)" = "Pulse (bpm)")
+  advs2$PARAM <- ordered(advs2$PARAM, c("Systolic Blood Pressure (mmHg)",
+                                        "Diastolic Blood Pressure (mmHg)",
+                                        "Pulse (bpm)"))
+
+  advs3 <- advs2 |>
+    group_by(PARAM, ATPT, TRTP, PRTFL) |>
+    summarise(n = n(),
+              mean = mean(CHG, na.rm = TRUE),
+              sd = sd(CHG, na.rm = TRUE),
+              median = median(CHG, na.rm = TRUE),
+              min = min(CHG, na.rm = TRUE),
+              max = max(CHG, na.rm = TRUE))
+
+  advs4 <- add_column(advs3, "N" = apply(advs3,
+                                         1,
+                                         function(x) {aSum <- sum(adsl[,"ARM"] == x["TRTP"], na.rm = TRUE)
+                                         ifelse(aSum == 0, NA, aSum)}),
+                      .after = 3)
+
+  advs4[!(advs4$PRTFL %in% "Week 24"), "TRTP"] <- NA
+  advs4[!(advs4$TRTP %in% "Placebo"), "ATPT"] <- NA
+  advs4[!(advs4$ATPT %in% "AFTER LYING DOWN FOR 5 MINUTES"), "PARAM"] <- NA
+  advs4[!(advs4$PRTFL %in% "Week 24"), "N"] <- NA
+
+
+
+  advs4$TRTP <- apply(advs4, 1, function(x) {switch(x["TRTP"],
+                                                    "Placebo" = "Placebo",
+                                                    "Xanomeline High Dose" = "Xan.High",
+                                                    "Xanomeline Low Dose" = "Xan.Low",
+                                                    NA)})
+
+  advs4$mean <- num_fmt(advs4$mean, digits = 1, size = 3)
+  advs4$sd <- num_fmt(advs4$sd, digits = 2, size = 4, int_len = 2)
+  advs4$median <- num_fmt(advs4$median, digits = 1, size = 2, int_len = 2)
+  advs4$min <- num_fmt(advs4$min, digits = 1, size = 4, int_len = 2)
+  advs4$max <- num_fmt(advs4$max, digits = 1, size = 4, int_len = 2)
+
+
+  names(advs4) <- c(
+    "Measure",
+    "Position",
+    "Treatment",
+    "N",
+    "Planned Relative Time",
+    "n",
+    "Mean",
+    "SD",
+    "Median",
+    "Min.",
+    "Max."
+  )
+
+  advs4 <- pad_row2(advs4, which(advs4[, "Planned Relative Time"] == "End of Trt.") + 1)
+
+  ht <- advs4 |>
+    huxtable::as_hux(add_colnames=TRUE) |>
+    huxtable::set_bold(1, 1:ncol(advs4), TRUE) |>
+    huxtable::set_align(1, 1:ncol(advs4), "center") |>
+    huxtable::set_align(2:nrow(advs4), 3, "center") |>
+    huxtable::set_align(2:nrow(advs4), 4:ncol(advs4), "left") |>
+    huxtable::set_valign(1, 1:ncol(advs4), "bottom") |>
+    huxtable::set_bottom_border(1, 1:ncol(advs4), 1) |>
+    huxtable::set_width(1.45) |>
+    huxtable::set_col_width(1:ncol(advs4), c(0.2, 0.15, 0.19, 0.03, 0.1, 0.03, 0.06, 0.06, 0.06, 0.06, 0.06))
+
+  huxtable::wrap(ht) <- FALSE
+
+  return(ht)
+}
+
+
+#' gen_ht_t14_703
+#' Generate Table 14-7.03 Summary of Weight Change from Baseline at End of Treatment
+#'
+#' @param advs
+#' @param adsl
+#'
+#' @return a huxtable
+#' @export
+#'
+#' @examples
+gen_ht_t14_703 <- function(advs, adsl) {
+  advs <- advs |>
+    filter(PARAM == "Weight (kg)")
+
+  advs$TRTP <- ordered(advs$TRTP, c("Placebo", "Xanomeline Low Dose", "Xanomeline High Dose"))
+
+  advs$EOTFL <- ifelse(advs$AVISITN == 99, "Y", NA)
+  advs$W24 <- ifelse(advs$AVISITN == 24, "Y", NA)
+  advs$ABLFL <- ifelse(advs$ABLFL == "Y", "Y", NA)
+
+  #Rbinded data.frame
+  advs2 <- rbind(advs[advs$EOTFL %in% "Y", ], advs[advs$W24 %in% "Y",], advs[advs$ABLFL %in% "Y",])
+
+  # Create table for stats
+  bw_stats <- advs2 |>
+    group_by(TRTP, ABLFL, W24, EOTFL) |>
+    summarise(n = n(),
+              Mean = mean(AVAL),
+              SD = sd(AVAL),
+              Median = median(AVAL),
+              Min. = min(AVAL),
+              Max. = max(AVAL)) |>
+    arrange()
+  bw_stats[, 2] <- rep(c("Baseline", "Week 24", "End of Trt."), 3)
+  bw_stats <- bw_stats[, c(-3, -4)]
+
+  bw_stats <- add_column(bw_stats, "Measure" = "Weight (kg)", .before= 1)
+  bw_stats[unlist(bw_stats[, 3]) != "Baseline", "TRTP"] <- NA
+  bw_stats[!(bw_stats$TRTP %in% "Placebo"), "Measure"] <- NA
+
+  bw_stats <- add_column(bw_stats, "N" = apply(bw_stats,
+                                               1,
+                                               function(x) {aSum <- sum(adsl[,"ARM"] == x["TRTP"], na.rm = TRUE)
+                                               ifelse(aSum == 0, NA, aSum)}),
+                         .before = 3)
+  bw_stats <- pad_row2(bw_stats, which(bw_stats$ABLFL == "End of Trt.",) + 1)
+  names(bw_stats)[4] <- "VISIT"
+
+
+  ### Weight Change from Baseline table
+  # Create table for baseline changes
+  .blfun <- function(x, usubjid = NULL) {
+    x <- x[x$USUBJID == unique(usubjid),]
+    bl <- as.numeric(x[x$ABLFL %in% "Y", "AVAL"])
+    w24 <- as.numeric(x[x$W24 %in% "Y", "AVAL"])
+    eot <- as.numeric(x[x$EOTFL %in% "Y", "AVAL"])
+    arm <- unique(x$TRTP)
+    ## Done this way to make dplyr easier
+    c(ifelse(length(w24-bl) == 0, NA, w24-bl),
+      ifelse(length(eot-bl) == 0, NA, eot-bl))
+  }
+
+  bw_bl <- advs2 |>
+    select(USUBJID, TRTP, ABLFL, W24, EOTFL, AVAL) |>
+    group_by(USUBJID) |>
+    summarise(`WEEK 24` = .blfun(., USUBJID)[1],
+              `End of Trt.` = .blfun(., USUBJID)[2],
+              TRTP = unique(TRTP)) |>
+    select(USUBJID, TRTP, `WEEK 24`, `End of Trt.`) |>
+    tidyr::pivot_longer(c(`WEEK 24`, `End of Trt.`), names_to = "VISIT", values_to = "change")
+  ## Add ordered factor to order arms
+  bw_bl$TRTP <- ordered(bw_bl$TRTP, c("Placebo", "Xanomeline Low Dose", "Xanomeline High Dose"))
+  bw_bl$VISIT <- ordered(bw_bl$VISIT,c("WEEK 24", "End of Trt."))
+
+  bw_bl_1 <- bw_bl |>
+    group_by(TRTP, VISIT) |>
+    summarise(n = sum(!is.na(change)),
+              Mean = mean(change, na.rm = TRUE),
+              SD = sd(change, na.rm = TRUE),
+              Median = median(change, na.rm = TRUE),
+              Min. = min(change, na.rm = TRUE),
+              Max. = max(change, na.rm = TRUE)) |>
+    ungroup()
+  bw_bl_1 <- add_column(bw_bl_1, "Measure" = "Weight Change\\line from Baseline", .before = 1)
+  bw_bl_1[bw_bl_1$VISIT != "WEEK 24", "TRTP"] <- NA
+  bw_bl_1[!(bw_bl_1$TRTP %in% "Placebo"), "Measure"] <- NA
+
+  bw_bl_1 <- add_column(bw_bl_1, "N" = apply(bw_bl_1,
+                                             1,
+                                             function(x) {aSum <- sum(adsl[,"ARM"] == x["TRTP"], na.rm = TRUE)
+                                             ifelse(aSum == 0, NA, aSum)}),
+                        .before = 3)
+  bw_bl_1 <- pad_row2(bw_bl_1, which(bw_bl_1$VISIT == "End of Trt.") + 1)
+
+  ### Combine Tables and match output
+  combinedTable <- rbind(bw_stats, bw_bl_1)
+  names(combinedTable)[2] <- "Treatment"
+  names(combinedTable)[4] <- "Planned Relative Time"
+  combinedTable[,"Treatment"] <- apply(combinedTable, 1, function(x){
+    switch(x["Treatment"],
+           "Placebo" = "Placebo",
+           "Xanomeline Low Dose" = "Xan.Low",
+           "Xanomeline High Dose" = "Xan.High",
+           NA)
+  })
+  combinedTable[,"Planned Relative Time"] <- apply(combinedTable, 1, function(x){
+    switch(x["Planned Relative Time"],
+           "Baseline" = "Baseline",
+           "WEEK 24" = "Week 24",
+           "Week 24" = "Week 24",
+           "End of Trt." = "End of Trt.",
+           NA)
+  })
+
+  ### Number formatting
+  class(combinedTable) <- "data.frame"
+  combinedTable[!is.na(combinedTable$Mean),"Mean"] <- num_fmt(unlist(combinedTable[!is.na(combinedTable$Mean),"Mean"]),
+                                                              digits = 1, size = 3, int_len = 2)
+  combinedTable[!is.na(combinedTable$SD),"SD"] <-  num_fmt(unlist(combinedTable[!is.na(combinedTable$SD),"SD"]),
+                                                           digits = 2, size = 3, int_len = 2)
+  combinedTable[!is.na(combinedTable$Median),"Median"] <-  num_fmt(unlist(combinedTable[!is.na(combinedTable$Median),"Median"]),
+                                                                   digits = 1, size = 3, int_len = 2)
+  combinedTable[!is.na(combinedTable$`Min.`),"Min."] <-  num_fmt(unlist(combinedTable[!is.na(combinedTable$`Min.`),"Min."]),
+                                                                 digits = 1, size = 3, int_len = 2)
+  combinedTable[!is.na(combinedTable$`Max.`),"Max."] <-  num_fmt(unlist(combinedTable[!is.na(combinedTable$`Max.`),"Max."]),
+                                                                 digits = 1, size = 3, int_len = 2)
+
+
+  ht <- combinedTable |>
+    huxtable::as_hux(add_colnames=TRUE)
+
+
+  huxtable::bottom_border(ht)[1, ] <- 1
+  huxtable::bold(ht)[1, ] <- TRUE
+  huxtable::align(ht)[1, ] <- 'center'
+  huxtable::align(ht)[,c(3, 5:10)] <- "center"
+  huxtable::width(ht) <- 1.5
+  huxtable::bottom_padding(ht) <- 0
+  huxtable::top_padding(ht) <- 0
+  huxtable::col_width(ht) <- c(0.25, 0.15, 0.05, 0.185, 0.04, 0.065, 0.065, 0.065, 0.065, 0.065)
+  huxtable::valign(ht)[1,] <- "bottom"
+  huxtable::escape_contents(ht) <- FALSE
+
+  return(ht)
+}
+
+
+#' gen_ht_t14_704
+#' Generate Table 14-7.04 Summary of Concomitant Medications (Number of Subjects)
+#'
+#' @param sdtm_cm
+#' @param adsl
+#'
+#' @return
+#' @export
+#'
+#' @examples
+gen_ht_t14_704 <- function(sdtm_cm, adsl) {
+
+  n_pct <- function(n, pct) {
+    # n (%) formatted string. e.g. 50 ( 75%)
+    return(
+      # Suppress conversion warnings
+      as.character(
+        # Form the string using glue and format
+        glue('{format(n, width=3)} ({format(round((n/pct) * 100))}%)')
+      )
+    )
+  }
+
+
+  cm <- sdtm_cm
+  adsl <- adsl
+  adsl$ARM <- ordered(adsl$ARM, c("Placebo", "Xanomeline Low Dose", "Xanomeline High Dose"))
+
+  ## Patients receiving at least one medication
+  cm_1 <- adsl |>
+    group_by(ARM) |>
+    summarise(n = sum(USUBJID %in% unique(cm$USUBJID)),
+              total = n())
+  cm_res <- n_pct(cm_1$n, cm_1$total)
+
+  cm_2 <- data.frame(
+    "Therapeutic class, n (%)" = "Patients receiving at least one concomitant medication",
+    "Placebo" = cm_res[1],
+    "Xanomeline Low Dose" = cm_res[2],
+    "Xanomeline High Dose" = cm_res[3],
+    stringsAsFactors = FALSE, check.names = FALSE, row.names = FALSE
+  )
+
+  ### Table
+  # Medication classes
+  cm_class <- sort(unique(cm$CMCLAS))
+
+  # By Class
+  df <- plyr::ldply(cm_class, function(class_i){
+    class_by_arm <- as.data.frame(adsl |>
+                                    group_by(ARM) |>
+                                    summarise(n = sum(USUBJID %in% unlist(unique(cm[cm$CMCLAS == class_i, "USUBJID"])))))
+
+    df_1 <- data.frame(
+      "Therapeutic class, n (%)" = class_i,
+      "Placebo" = unname(ifelse(class_by_arm[1, "n"] == 0, "  0", n_pct(class_by_arm[1, "n"], cm_1[1, "total"]))),
+      "Xanomeline Low Dose" = unname(ifelse(class_by_arm[2, "n"] == 0, "  0", n_pct(class_by_arm[2, "n"], cm_1[2, "total"]))),
+      "Xanomeline High Dose" = unname(ifelse(class_by_arm[3, "n"] == 0, "  0", n_pct(class_by_arm[3, "n"], cm_1[3, "total"]))),
+      stringsAsFactors = FALSE, check.names = FALSE, row.names = FALSE
+    )
+
+    #Pad Row
+    df_1 <- add_row(df_1, "Therapeutic class, n (%)" = "", .before = 1)
+
+    #Coded medication names
+    cm_medi <- unlist(unique(cm[cm$CMCLAS == class_i, "CMDECOD"]), use.names = FALSE)
+
+    #By Medication
+    df_2 <- plyr::ldply(cm_medi, function(medi_i) {
+
+      medi_by_arm <- as.data.frame(adsl |>
+                                     group_by(ARM) |>
+                                     summarise(n = sum(USUBJID %in% unlist(unique(cm[cm$CMDECOD == medi_i, "USUBJID"])))))
+
+
+      df_3 <- data.frame(
+        "Therapeutic class, n (%)" = paste0("\t", unname(medi_i)),
+        "Placebo" = unname(ifelse(medi_by_arm[1, "n"] == 0, "  0", n_pct(medi_by_arm[1, "n"], cm_1[1, "total"]))),
+        "Xanomeline Low Dose" = unname(ifelse(medi_by_arm[2, "n"] == 0, "  0", n_pct(medi_by_arm[2, "n"], cm_1[2, "total"]))),
+        "Xanomeline High Dose" = unname(ifelse(medi_by_arm[3, "n"] == 0, "  0", n_pct(medi_by_arm[3, "n"], cm_1[3, "total"]))),
+        stringsAsFactors = FALSE, check.names = FALSE, row.names = FALSE
+      )
+    })
+    ## Order Medications. Order Descending by placebo count and ascending alphabetically
+    # radix used because its the only method that supports a decreasing vector.
+    df_2 <- df_2[order(df_2$Placebo, df_2[,1], decreasing = c(TRUE, FALSE), method = "radix"),]
+    rbind(df_1, df_2)
+  })
+
+
+  combinedTable <- rbind(cm_2, df)
+
+
+  ### Add Headers
+  headers <- adsl |>
+    group_by(ARM) |>
+    summarise(N = n()) |>
+    mutate(labels = str_replace_all(str_wrap(glue('{ARM} (N={N})'), width=10), "\n", function(x) "\\line "))
+  names(combinedTable) <- c("Therapeutic class, n (%)", headers$labels)
+
+
+  ht <- combinedTable |>
+    huxtable::as_hux(add_colnames=TRUE)
+
+
+  huxtable::bottom_border(ht)[1, ] <- 1
+  huxtable::bold(ht)[1, ] <- TRUE
+  huxtable::align(ht)[1, ] <- 'center'
+  huxtable::align(ht)[1, 1] <- "left"
+  huxtable::width(ht) <- 1.2
+  huxtable::bottom_padding(ht) <- 0
+  huxtable::top_padding(ht) <- 0
+  huxtable::col_width(ht) <- c(.6, .15, .15, .15)
+  huxtable::valign(ht)[1,] <- "bottom"
+  huxtable::escape_contents(ht) <- FALSE
+  huxtable::align(ht)[-1,2:4] <- "left"
+
+  return (ht)
+}

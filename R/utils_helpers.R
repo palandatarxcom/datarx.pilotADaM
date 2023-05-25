@@ -138,6 +138,32 @@ n_pct <- function(n, pct, n_width=3, pct_width=3, digits=0, mark_lt=TRUE) {
 
 n_pct <- Vectorize(n_pct)
 
+#' n_pct2
+#'
+#' @param n
+#' @param pct
+#' @param n_width
+#' @param pct_width
+#'
+#' @return
+#' @export
+#'
+#' @examples
+n_pct2 <- function(n, pct, n_width=3, pct_width=3) {
+  n <- unlist(n)
+  pct <- unique(pct)
+  # n (%) formatted string. e.g. 50 ( 75%)
+  unlist(lapply(n, function(x) {
+    if(x == 0) " 0      "
+    else {
+      as.character(
+        # Form the string using glue and format
+        glue('{format(x, width=n_width)}({format(round((x/pct) * 100), width=pct_width)}%)')
+      )
+    }
+  }))
+}
+
 #' sum_subgrp
 #'
 #' @param .data
@@ -432,7 +458,7 @@ fisher_test_ae <- function(.data) {
   dim(.data) <- c(2, 2)
 
   # Return the p-value of interest
-  p <- fisher.test(.data)$p.value
+  p <- stats::fisher.test(.data)$p.value
 
   # Format the p-values for display
   disp <- num_fmt(p, digits=3, size=5, int_len=1)
@@ -488,6 +514,20 @@ attach_p <- function(.data, p_value, digits = 4) {
 pad_row <- function(.data, n=1) {
   .data[(nrow(.data)+1):(nrow(.data)+n), ] <- ""
   .data
+}
+
+pad_row2 <- function(df, r) {
+  #df - dataframe to insert pad
+  #r - row number to pad
+  for(i in seq(along = r)) {
+    if(r[i] + i - 1 < nrow(df)){
+      df[seq(r[i] + i, nrow(df) + 1),] <- df[seq(r[i] + (i - 1), nrow(df)),]
+      df[r[i] + (i - 1),] <- NA
+    } else {
+      df[r[i] + (i - 1),] <- NA
+    }
+  }
+  df
 }
 
 
@@ -710,3 +750,4 @@ efficacy_models <- function(data, var=NULL, wk=NULL, model_type='ancova') {
   return(bind_rows(sect1, pw_final))
 
 }
+
