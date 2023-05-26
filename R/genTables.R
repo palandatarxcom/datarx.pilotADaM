@@ -1652,6 +1652,700 @@ gen_ht_t14_502 <- function(adae, adsl) {
 }
 
 
+#' gen_ht_t14_601
+#'
+#' Generate Table 14-6.01 Summary Statistics for Continuous Laboratory Values
+#'
+#' @param adlbc
+#' @param adlbh
+#'
+#' @return a huxtable
+#' @export
+#'
+#' @examples
+gen_ht_t14_601 <- function(adlbc, adlbh) {
+  adlbc <- adlbc |>
+    filter(SAFFL == 'Y' & (AVISITN != 99 | (AVISITN == 99 & AENTMTFL=='Y')))
+
+  adlbc$PARAM<- recode(adlbc$PARAM,
+                       "Alanine Aminotransferase (U/L)" = "ALANINE AMINOTRANSFERASE",
+                       "Albumin (g/L)" = "ALBUMIN",
+                       "Alkaline Phosphatase (U/L)" = "ALKALINE PHOSPHATASE",
+                       "Aspartate Aminotransferase (U/L)" = "ASPARTATE AMINOTRANSFERASE",
+                       "Bilirubin (umol/L)" = "BILIRUBIN",
+                       "Calcium (mmol/L)" = "CALCIUM",
+                       "Chloride (mmol/L)" = "CHLORIDE",
+                       "Cholesterol (mmol/L)" = "CHOLESTEROL",
+                       "Creatine Kinase (U/L)" = "CREATINE KINASE",
+                       "Creatinine (umol/L)" = "CREATININE",
+                       "Gamma Glutamyl Transferase (U/L)" = "GAMMA GLUTAMYL TRANSFERASE",
+                       "Glucose (mmol/L)" = "GLUCOSE",
+                       "Phosphate (mmol/L)" = "PHOSPHATE",
+                       "Potassium (mmol/L)" = "POTASSIUM",
+                       "Protein (g/L)" = "PROTEIN",
+                       "Sodium (mmol/L)" = "SODIUM",
+                       "Urate (umol/L)" = "URATE",
+                       "Blood Urea Nitrogen (mmol/L)" = "UREA NITROGEN")
+
+  adlbh <- adlbh |>
+    filter(SAFFL == 'Y' & !(PARAM %in% c('Anisocytes', 'Poikilocytes', 'Microcytes', 'Macrocytes', 'Polychromasia'))
+           & (AVISITN != 99 | (AVISITN == 99 & AENTMTFL=='Y')))
+
+  adlbh$PARAM<- recode(adlbh$PARAM,
+                       "Basophils (GI/L)" = "BASOPHILS",
+                       "Eosinophils (GI/L)" = "EOSINOPHILS",
+                       "Ery. Mean Corpuscular HGB Concentration (mmol/L)" = "ERY. MEAN CORPUSCULAR HB CONCENTRATION",
+                       "Ery. Mean Corpuscular Hemoglobin (fmol(Fe))" = "ERY. MEAN CORPUSCULAR HEMOGLOBIN",
+                       "Ery. Mean Corpuscular Volume (fL)" = "ERY. MEAN CORPUSCULAR VOLUME",
+                       "Erythrocytes (TI/L)" = "ERYTHROCYTES",
+                       "Hematocrit" = "HEMATOCRIT",
+                       "Hemoglobin (mmol/L)" = "HEMOGLOBIN",
+                       "Leukocytes (GI/L)" = "LEUKOCYTES",
+                       "Lymphocytes (GI/L)" = "LYMPHOCYTES",
+                       "Monocytes (GI/L)" = "MONOCYTES",
+                       "Platelet (GI/L)" = "PLATELET")
+
+  # Template for assigning display visit values
+  visit_names <- data.frame(
+    AVISITN = c(0, 2, 4, 6, 8, 12, 16, 20, 24, 26, 99),
+    AVISIT = c("  Bsln", "  Wk 2", "  Wk 4", "  Wk 6", "  Wk 8", "  Wk 12",
+               "  Wk 16", "  Wk 20", "  Wk 24", "  Wk 26", "  End[1]"),
+    stringsAsFactors = FALSE
+  )
+
+  test_summary <- function(x, df_=NULL) {
+    # Build up the visit table and attach on the end visit (using flag)
+    visits <- df_ |>
+      # Filter to the specified test
+      filter(AVISIT != 'UNSCHEDULED' & PARAM == x)
+
+    # Summarize results by visit and treatment
+    res <- visits |>
+      group_by(AVISITN, TRTPN) |>
+      summarize(n = n(),
+                mean_res = mean(AVAL, na.rm=TRUE),
+                sd_res = sd(AVAL, na.rm=TRUE))
+
+    # Summarize change from baseline by visit and treatment
+    chgbl <- visits |>
+      filter(AVISITN != 1) |>
+      group_by(AVISITN, TRTPN) |>
+      summarize(mean_cbl = mean(CHG, na.rm=TRUE),
+                sd_cbl = sd(CHG, na.rm=TRUE))
+
+    # Build the display string
+    df <- merge(res, chgbl, by = c('AVISITN', 'TRTPN'), all=TRUE) |>
+      rowwise() |>
+      mutate(
+        N =
+          ifelse(
+            !is.na(n),
+            num_fmt(n, size=2, int_len=2),
+            ''),
+        msr =
+          ifelse(
+            !is.na(mean_res),
+            as.character(glue('{num_fmt(mean_res, size=5, digits=1, int_len=3)} ({num_fmt(sd_res, size=6, digits=2, int_len=3)})')),
+            ''),
+        msc =
+          ifelse(
+            !is.na(mean_cbl),
+            as.character(glue('{num_fmt(mean_cbl, size=5, digits=1, int_len=3)} ({num_fmt(sd_cbl, size=6, digits=2, int_len=3)})')),
+            '')
+      ) |>
+      # Transpose the treatments out
+      select(AVISITN, TRTPN, N, msr, msc) |>
+      tidyr::pivot_wider(names_from = TRTPN, values_from = c(N, msr, msc)) |>
+      # Merge in the visits
+      merge(visit_names, by='AVISITN') |>
+      arrange(AVISITN) |>
+      select(AVISIT, N_0, msr_0, msc_0, N_54, msr_54, msc_54, N_81, msr_81, msc_81) |>
+      pad_row()
+
+    # Stub header
+    stub_head = data.frame(AVISIT = x, stringsAsFactors = FALSE)
+
+    final <- bind_rows(stub_head, df)
+    ht <- huxtable::as_hux(final) |>
+      huxtable::merge_cells(1, 1:5)
+
+    return(ht)
+  }
+
+  add_group_head <- function(ht, group) {
+    # Make a three row subset to grab names
+    head_ <- ht[1:3, ]
+    # Blank everything out
+    head_[,] <- ''
+    # First value is the group label
+    head_[1, 1] <- group
+    # Merge the cells
+    head_ <- huxtable::merge_cells(head_, 1, 1:5)
+    # Bind to the table
+    rbind(head_, ht)
+  }
+
+  # Summarize all the chemistry data
+  chem <- do.call(rbind, lapply(sort(unique(adlbc$PARAM)), test_summary, df_=adlbc)) |>
+    add_group_head('CHEMISTRY')
+
+  # Summarize all the hematology data
+  hema <- do.call(rbind, lapply(sort(unique(adlbh$PARAM)), test_summary, df_=adlbh)) |>
+    add_group_head('HEMATOLOGY')
+
+  # Bind those two
+  ht <- rbind(chem, hema)
+
+  # Make the column headers
+  col_headers <- ht[5:6, ] # Stealing out a chunk of the table with no cell merging
+  col_headers[1, ] <- c('', 'Placebo', '', '', 'Xanomeline Low', '', '', 'Xanomeline High', '', '')
+  col_headers[2, ] <- c('Visit', 'N', 'Mean (SD)', 'Change\\line from Bsln\\line Mean (SD)',
+                        'N', 'Mean (SD)', 'Change\\line from Bsln\\line Mean (SD)',
+                        'N', 'Mean (SD)', 'Change\\line from Bsln\\line Mean (SD)')
+
+  # Now
+  col_headers <- col_headers |>
+    # Placebo spanner
+    huxtable::merge_cells(1, 2:4) |>
+    huxtable::set_bottom_border(1, 2:4, 1) |>
+    huxtable::set_bottom_border_style(1, 2:4, 'dashed') |>
+    # Xanomeline Low spanner
+    huxtable::merge_cells(1, 5:7) |>
+    huxtable::set_bottom_border(1, 5:7, 1) |>
+    huxtable::set_bottom_border_style(1, 5:7, 'dashed') |>
+    # Xanomeline High spanner
+    huxtable::merge_cells(1, 8:10) |>
+    huxtable::set_bottom_border(1, 8:10, 1) |>
+    huxtable::set_bottom_border_style(1, 8:10, 'dashed') |>
+    # Bottom border
+    huxtable::set_bottom_border(2, 1:10, value=1) |>
+    # bold it all
+    huxtable::set_bold(value=TRUE) |>
+    huxtable::set_align(value='center') |>
+    huxtable::set_valign(value='bottom')
+
+  final <- rbind(col_headers, ht) |>
+    huxtable::set_width(1.5) |>
+    huxtable::set_escape_contents(FALSE) |>
+    huxtable::set_col_width(1:10, value=c(.1, .03, .14, .14, .03, .14, .14, .03, .14, .14)) |>
+    huxtable::set_bottom_padding(0) |>
+    huxtable::set_top_padding(0)
+
+  return(final)
+}
+
+
+#' gen_ht_t14_604
+#'
+#' Generate Table 14-6.04 Shifts of Laboratory Values During Treatment, Categorized Based on Threshold Ranges, by Visit
+#'
+#' @param adlbc
+#' @param adlbh
+#' @param adsl
+#'
+#' @return a huxtable
+#' @export
+#'
+#' @examples
+gen_ht_t14_604 <- function(adlbc, adlbh, adsl) {
+
+  pad_row <- function(df, r) {
+    #df - dataframe to insert pad
+    #r - row number to pad
+    for(i in seq(along = r)) {
+      if(r[i] + i - 1 < nrow(df)){
+        df[seq(r[i] + i, nrow(df) + 1),] <- df[seq(r[i] + (i - 1), nrow(df)),]
+        df[r[i] + (i - 1),] <- NA
+      } else {
+        df[r[i] + (i - 1),] <- NA
+      }
+    }
+    df
+  }
+
+  n_pct <- function(n, pct, n_width=3, pct_width=3) {
+    n <- unlist(n)
+    pct <- unique(pct)
+    # n (%) formatted string. e.g. 50 ( 75%)
+    unlist(lapply(n, function(x) {
+      if(x == 0) " 0      "
+      else {
+        as.character(
+          # Form the string using glue and format
+          glue('{format(x, width=n_width)}({format(round((x/pct) * 100), width=pct_width)}%)')
+        )
+      }
+    }))
+  }
+
+  ## Chem
+  adlbc <- adlbc |>
+    filter(SAFFL == "Y", AVISITN != 99)
+  adlbh <- adlbh |>
+    filter(SAFFL == "Y", AVISITN != 99)
+  comb <- rbind(adlbc, adlbh)
+
+  #sort tests
+  comb$PARAM<- recode(comb$PARAM,
+                      "Alanine Aminotransferase (U/L)" = "ALANINE AMINOTRANSFERASE",
+                      "Albumin (g/L)" = "ALBUMIN",
+                      "Alkaline Phosphatase (U/L)" = "ALKALINE PHOSPHATASE",
+                      "Aspartate Aminotransferase (U/L)" = "ASPARTATE AMINOTRANSFERASE",
+                      "Bilirubin (umol/L)" = "BILIRUBIN",
+                      "Calcium (mmol/L)" = "CALCIUM",
+                      "Chloride (mmol/L)" = "CHLORIDE",
+                      "Cholesterol (mmol/L)" = "CHOLESTEROL",
+                      "Creatine Kinase (U/L)" = "CREATINE KINASE",
+                      "Creatinine (umol/L)" = "CREATININE",
+                      "Gamma Glutamyl Transferase (U/L)" = "GAMMA GLUTAMYL TRANSFERASE",
+                      "Glucose (mmol/L)" = "GLUCOSE",
+                      "Phosphate (mmol/L)" = "PHOSPHATE",
+                      "Potassium (mmol/L)" = "POTASSIUM",
+                      "Protein (g/L)" = "PROTEIN",
+                      "Sodium (mmol/L)" = "SODIUM",
+                      "Urate (umol/L)" = "URATE",
+                      "Blood Urea Nitrogen (mmol/L)" = "UREA NITROGEN",
+                      "Basophils (GI/L)" = "BASOPHILS",
+                      "Eosinophils (GI/L)" = "EOSINOPHILS",
+                      "Ery. Mean Corpuscular HGB Concentration (mmol/L)" = "ERY. MEAN CORPUSCULAR HB CONCENTRATION",
+                      "Ery. Mean Corpuscular Hemoglobin (fmol(Fe))" = "ERY. MEAN CORPUSCULAR HEMOGLOBIN",
+                      "Ery. Mean Corpuscular Volume (fL)" = "ERY. MEAN CORPUSCULAR VOLUME",
+                      "Erythrocytes (TI/L)" = "ERYTHROCYTES",
+                      "Hematocrit" = "HEMATOCRIT",
+                      "Hemoglobin (mmol/L)" = "HEMOGLOBIN",
+                      "Leukocytes (GI/L)" = "LEUKOCYTES",
+                      "Lymphocytes (GI/L)" = "LYMPHOCYTES",
+                      "Monocytes (GI/L)" = "MONOCYTES",
+                      "Platelet (GI/L)" = "PLATELET")
+  #sort tests
+  comb$PARAM <-ordered(comb$PARAM, c(
+    "ALANINE AMINOTRANSFERASE",
+    "ALBUMIN",
+    "ALKALINE PHOSPHATASE",
+    "ASPARTATE AMINOTRANSFERASE",
+    "BILIRUBIN",
+    "CALCIUM",
+    "CHLORIDE",
+    "CHOLESTEROL",
+    "CREATINE KINASE",
+    "CREATININE",
+    "GAMMA GLUTAMYL TRANSFERASE",
+    "GLUCOSE",
+    "PHOSPHATE",
+    "POTASSIUM",
+    "PROTEIN",
+    "SODIUM",
+    "URATE",
+    "UREA NITROGEN",
+    "BASOPHILS",
+    "EOSINOPHILS",
+    "ERY. MEAN CORPUSCULAR HB CONCENTRATION",
+    "ERY. MEAN CORPUSCULAR HEMOGLOBIN",
+    "ERY. MEAN CORPUSCULAR VOLUME",
+    "ERYTHROCYTES",
+    "HEMATOCRIT",
+    "HEMOGLOBIN",
+    "LEUKOCYTES",
+    "LYMPHOCYTES",
+    "MONOCYTES",
+    "PLATELET"))
+  comb$TRTP <- ordered(comb$TRTP, c("Placebo", "Xanomeline Low Dose", "Xanomeline High Dose"))
+  comb$ANRIND <- ordered(comb$ANRIND, c("N", "H"))
+  comb$BNRIND <- ordered(comb$BNRIND, c("N", "H"))
+  comb$VISIT <- ordered(comb$VISIT, c(
+    "WEEK 2",
+    "WEEK 4",
+    "WEEK 6",
+    "WEEK 8",
+    "WEEK 12",
+    "WEEK 16",
+    "WEEK 20",
+    "WEEK 24",
+    "WEEK 26"
+  ))
+
+  total_ABLFL1 <- comb|>
+    filter(!is.na(VISIT), !is.na(TRTP), !is.na(BNRIND), !is.na(ANRIND), !is.na(PARAM)) |>
+    group_by(PARAM, VISIT, TRTP, BNRIND) |>
+    # complete(nesting(TRTP, ABLFL)) |>
+    summarise(N = n())
+
+  total_ABLFL <- total_ABLFL1 |>
+    mutate(ANRIND = ordered("T", c("T", "N", "H"))) |>
+    tidyr::pivot_wider(id_cols = c(PARAM, VISIT, ANRIND), names_from = c(TRTP, BNRIND), values_from = N) |>
+    ungroup()
+
+  comb2 <- comb |>
+    filter(!is.na(VISIT), !is.na(TRTP), !is.na(BNRIND), !is.na(ANRIND), !is.na(PARAM)) |>
+    group_by(PARAM, VISIT, TRTP, BNRIND, ANRIND) |>
+    # complete(nesting(BNRIND, ANRIND)) |>
+    summarise(N = n()) |>
+    mutate(n2 = n_pct(N, total_ABLFL1[total_ABLFL1$PARAM == PARAM &
+                                        total_ABLFL1$VISIT == VISIT   &
+                                        total_ABLFL1$TRTP == TRTP     &
+                                        total_ABLFL1$BNRIND == BNRIND, "N"], n_width = 2)) |>
+    ungroup() |>
+    tidyr::pivot_wider(id_cols = c(PARAM, VISIT, ANRIND), names_from = c(TRTP, BNRIND), values_from = n2)
+
+  comb2$ANRIND <- ordered(comb2$ANRIND, c("T", "N", "H"))
+
+  total_ABLFL$Placebo_N <- num_fmt(total_ABLFL$Placebo_N, size = 2, int_len = 2)
+  total_ABLFL$Placebo_H <- num_fmt(total_ABLFL$Placebo_H, size = 2, int_len = 2)
+  total_ABLFL$`Xanomeline Low Dose_N` <- num_fmt(total_ABLFL$`Xanomeline Low Dose_N`, size = 2, int_len = 2)
+  total_ABLFL$`Xanomeline Low Dose_H` <- num_fmt(total_ABLFL$`Xanomeline Low Dose_H`, size = 2, int_len = 2)
+  total_ABLFL$`Xanomeline High Dose_N` <- num_fmt(total_ABLFL$`Xanomeline High Dose_N`, size = 2, int_len = 2)
+  total_ABLFL$`Xanomeline High Dose_H` <- num_fmt(total_ABLFL$`Xanomeline High Dose_H`, size = 2, int_len = 2)
+
+  comb3 <- comb2 |>
+    rbind(total_ABLFL) |>
+    arrange(PARAM, VISIT, ANRIND)
+
+  comb3$VISIT <- as.character(stringr::str_extract(comb3$VISIT, "[0-9]+"))
+  comb3$ANRIND <- as.character(recode(comb3$ANRIND,
+                                      "T" = "n",
+                                      "N" = "Normal",
+                                      "H" = "High"))
+  names(comb3) <- c(
+    "rowlbl",
+    "Week",
+    "Shift to",
+    "Normal at Baseline",
+    "High at Baseline",
+    "Normal at Baseline",
+    "High at Baseline",
+    "Normal at Baseline",
+    "High at Baseline"
+  )
+
+  comb3 <- comb3[!apply(comb3, 1, function(x) {
+    all(x[4:9] ==  " 0      ") & all(x[3] == "High")
+  }), ]
+
+  comb4 <- pad_row(comb3, which(comb3$`Shift to` == "n")) |>
+    add_row('Week' = NA, .before = 1) |>
+    add_row("Week" = NA, .before = 1)
+  comb4 <- comb4 |>
+    add_row("Week" = NA, .before = 541) |>
+    add_row("Week" = NA, .before = 541)
+
+  comb4[,1] <- as.character(comb4$rowlbl)
+
+  comb4[!(comb4$`Shift to` %in% "n") , 2] <- NA
+  comb4[!(comb4$Week %in% "2"), 1] <- NA
+  comb4[2,1] <- "CHEMISTRY"
+  comb4[3,1] <- "----------"
+  comb4[542,1] <- "HEMATOLOGY"
+  comb4[543,1] <- "----------"
+
+
+  names(comb4) <- c(
+    "",
+    "Week",
+    "Shift to",
+    "Normal at Baseline",
+    "High at Baseline",
+    "Normal at Baseline",
+    "High at Baseline",
+    "Normal at Baseline",
+    "High at Baseline"
+  )
+
+
+  headers <- adsl |>
+    filter(ARM != "Screen Failure") |>
+    group_by(ARM) |>
+    summarise(N = n()) |>
+    mutate(label = paste0(recode(ARM,
+                                 "Placebo" = "Placebo",
+                                 "Xanomeline Low Dose" = "Xan. Low",
+                                 "Xanomeline High Dose" = "Xan. High"), " (N=", N, ")"))
+
+
+  ht <- comb4 |>
+    huxtable::as_huxtable(add_colnames = TRUE)
+
+  ht <- huxtable::as_hux(pad_row(as.data.frame(ht), c(1,1)), add_colnames = FALSE)
+  ht[1, 4] <- headers[1, "label"]
+  ht[1, 6] <- headers[3, "label"]
+  ht[1, 8] <- headers[2, "label"]
+
+  ht2 <- ht |>
+    huxtable::merge_cells(1, 4:5) |>
+    huxtable::merge_cells(1, 6:7) |>
+    huxtable::merge_cells(1, 8:9) |>
+    huxtable::set_bottom_border(2, 4:5, 1) |>
+    huxtable::set_bottom_border(2, 6:7, 1) |>
+    huxtable::set_bottom_border(2, 8:9, 1) |>
+    huxtable::set_bottom_border(3, 1:9, 1) |>
+    huxtable::set_width(1.4) |>
+    huxtable::set_escape_contents(FALSE) |>
+    huxtable::set_bold(1:3, 1:9, TRUE) |>
+    huxtable::set_valign(1:3, 1:9, "bottom") |>
+    huxtable::set_align(3, 1:9, "center") |>
+    huxtable::set_align(1, 1:9, "center") |>
+    huxtable::set_col_width(1:9, c(0.29, 0.06, 0.07, rep(0.1, 6)))
+}
+
+
+#' gen_ht_t14_605
+#'
+#' Generate Table 14-6.05 Shifts of Laboratory Values During Treatment, Categorized Based on Threshold Ranges
+#'
+#' @param adlbc
+#' @param adlbh
+#' @param adsl
+#'
+#' @return a huxtable
+#' @export
+#'
+#' @examples
+gen_ht_t14_605 <- function(adlbc, adlbh, adsl) {
+
+  pad_row <- function(df, r) {
+    #df - dataframe to insert pad
+    #r - row number to pad
+    for(i in seq(along = r)) {
+      if(r[i] + i - 1 < nrow(df)){
+        df[seq(r[i] + i, nrow(df) + 1),] <- df[seq(r[i] + (i - 1), nrow(df)),]
+        df[r[i] + (i - 1),] <- NA
+      } else {
+        df[r[i] + (i - 1),] <- NA
+      }
+    }
+    df
+  }
+
+  n_pct <- function(n, pct, n_width=3, pct_width=3) {
+    n <- unlist(n)
+    pct <- unique(pct)
+    # n (%) formatted string. e.g. 50 ( 75%)
+    unlist(lapply(n, function(x) {
+      if(x == 0) " 0      "
+      else {
+        as.character(
+          # Form the string using glue and format
+          glue('{format(x, width=n_width)}({format(round((x/pct) * 100), width=pct_width)}%)')
+        )
+      }
+    }))
+  }
+
+  adlbc <- adlbc |>
+    filter(SAFFL == "Y", ANL01FL == "Y")
+  adlbh <- adlbh |>
+    filter(SAFFL == "Y", ANL01FL == "Y")
+  comb <- rbind(adlbc, adlbh)
+
+
+  comb$PARAM<- recode(comb$PARAM,
+                      "Alanine Aminotransferase (U/L)" = "ALANINE AMINOTRANSFERASE",
+                      "Albumin (g/L)" = "ALBUMIN",
+                      "Alkaline Phosphatase (U/L)" = "ALKALINE PHOSPHATASE",
+                      "Aspartate Aminotransferase (U/L)" = "ASPARTATE AMINOTRANSFERASE",
+                      "Bilirubin (umol/L)" = "BILIRUBIN",
+                      "Calcium (mmol/L)" = "CALCIUM",
+                      "Chloride (mmol/L)" = "CHLORIDE",
+                      "Cholesterol (mmol/L)" = "CHOLESTEROL",
+                      "Creatine Kinase (U/L)" = "CREATINE KINASE",
+                      "Creatinine (umol/L)" = "CREATININE",
+                      "Gamma Glutamyl Transferase (U/L)" = "GAMMA GLUTAMYL TRANSFERASE",
+                      "Glucose (mmol/L)" = "GLUCOSE",
+                      "Phosphate (mmol/L)" = "PHOSPHATE",
+                      "Potassium (mmol/L)" = "POTASSIUM",
+                      "Protein (g/L)" = "PROTEIN",
+                      "Sodium (mmol/L)" = "SODIUM",
+                      "Urate (umol/L)" = "URATE",
+                      "Blood Urea Nitrogen (mmol/L)" = "UREA NITROGEN",
+                      "Basophils (GI/L)" = "BASOPHILS",
+                      "Eosinophils (GI/L)" = "EOSINOPHILS",
+                      "Ery. Mean Corpuscular HGB Concentration (mmol/L)" = "ERY. MEAN CORPUSCULAR HB CONCENTRATION",
+                      "Ery. Mean Corpuscular Hemoglobin (fmol(Fe))" = "ERY. MEAN CORPUSCULAR HEMOGLOBIN",
+                      "Ery. Mean Corpuscular Volume (fL)" = "ERY. MEAN CORPUSCULAR VOLUME",
+                      "Erythrocytes (TI/L)" = "ERYTHROCYTES",
+                      "Hematocrit" = "HEMATOCRIT",
+                      "Hemoglobin (mmol/L)" = "HEMOGLOBIN",
+                      "Leukocytes (GI/L)" = "LEUKOCYTES",
+                      "Lymphocytes (GI/L)" = "LYMPHOCYTES",
+                      "Monocytes (GI/L)" = "MONOCYTES",
+                      "Platelet (GI/L)" = "PLATELET")
+  #sort tests
+  comb$PARAM <-ordered(comb$PARAM, c(
+    "ALANINE AMINOTRANSFERASE",
+    "ALBUMIN",
+    "ALKALINE PHOSPHATASE",
+    "ASPARTATE AMINOTRANSFERASE",
+    "BILIRUBIN",
+    "CALCIUM",
+    "CHLORIDE",
+    "CHOLESTEROL",
+    "CREATINE KINASE",
+    "CREATININE",
+    "GAMMA GLUTAMYL TRANSFERASE",
+    "GLUCOSE",
+    "PHOSPHATE",
+    "POTASSIUM",
+    "PROTEIN",
+    "SODIUM",
+    "URATE",
+    "UREA NITROGEN",
+    "BASOPHILS",
+    "EOSINOPHILS",
+    "ERY. MEAN CORPUSCULAR HB CONCENTRATION",
+    "ERY. MEAN CORPUSCULAR HEMOGLOBIN",
+    "ERY. MEAN CORPUSCULAR VOLUME",
+    "ERYTHROCYTES",
+    "HEMATOCRIT",
+    "HEMOGLOBIN",
+    "LEUKOCYTES",
+    "LYMPHOCYTES",
+    "MONOCYTES",
+    "PLATELET"))
+  comb$TRTP <- ordered(comb$TRTP, c("Placebo", "Xanomeline Low Dose", "Xanomeline High Dose"))
+  comb$BNRIND <- ordered(comb$BNRIND, c("N", "H"))
+  comb$ANRIND <- ordered(comb$ANRIND, c("N", "H"))
+
+  comb <- comb |>
+    filter(!is.na(comb$PARAM), !is.na(comb$TRTP), !is.na(comb$BNRIND), !is.na(comb$ANRIND), AVISITN != 99)
+
+  total_bltrfl1 <- comb|>
+    filter(!is.na(TRTP), !is.na(BNRIND), !is.na(ANRIND), !is.na(PARAM)) |>
+    group_by(PARAM, TRTP, BNRIND) |>
+    # complete(nesting(TRTP, BNRIND)) |>
+    summarise(N = n())
+
+  total_bltrfl <- total_bltrfl1 |>
+    mutate(ANRIND = ordered("T", c("T", "N", "H"))) |>
+    tidyr::pivot_wider(id_cols = c(PARAM, ANRIND), names_from = c(TRTP, BNRIND), values_from = N) |>
+    ungroup()
+
+  comb2 <- comb |>
+    group_by(PARAM, TRTP, BNRIND, ANRIND) |>
+    # complete(nesting(BNRIND, ANRIND)) |>
+    summarise(N = n()) |>
+    ungroup()
+
+
+  pvals <- c()
+  for(i in levels(comb$PARAM)) {
+    mat <-  comb[comb$PARAM == i, c("ANRIND", "TRTP", "BNRIND")]
+
+    if(all(mat[, "ANRIND"] == "N")) pvals[i] <- ""
+    else {
+      pvals[i] <- tryCatch(num_fmt(cmh_p(mat, ANRIND ~ TRTP | BNRIND, alternate = "rmeans"), digits = 3, int_len = 1),
+                           error = function(c) ""
+      )
+    }
+  }
+
+  temp1 <- mat |>
+    group_by(TRTP) |>
+    summarise(n = n())
+
+  comb3 <- comb2 |>
+    group_by(PARAM, TRTP, BNRIND) |>
+    mutate(n2 = n_pct(N, total_bltrfl1[total_bltrfl1$PARAM == PARAM &
+                                         total_bltrfl1$TRTP == TRTP  &
+                                         total_bltrfl1$BNRIND == BNRIND, "N"], n_width = 2)) |>
+    ungroup() |>
+    tidyr::pivot_wider(id_cols = c(PARAM, ANRIND), names_from = c(TRTP, BNRIND), values_from = n2)
+
+  comb4 <- comb3[!apply(comb3, 1, function(x) {
+    all(x[3:8] ==  " 0      ") & all(x[2] == "H")
+  }), ]
+
+
+  comb4$ANRIND <- ordered(comb4$ANRIND, c("T", "N", "H"))
+
+  total_bltrfl$Placebo_N <- num_fmt(total_bltrfl$Placebo_N, size = 2, int_len = 2)
+  total_bltrfl$Placebo_H <- num_fmt(total_bltrfl$Placebo_H, size = 2, int_len = 2)
+  total_bltrfl$`Xanomeline Low Dose_N` <- num_fmt(total_bltrfl$`Xanomeline Low Dose_N`, size = 2, int_len = 2)
+  total_bltrfl$`Xanomeline Low Dose_H` <- num_fmt(total_bltrfl$`Xanomeline Low Dose_H`, size = 2, int_len = 2)
+  total_bltrfl$`Xanomeline High Dose_N` <- num_fmt(total_bltrfl$`Xanomeline High Dose_N`, size = 2, int_len = 2)
+  total_bltrfl$`Xanomeline High Dose_H` <- num_fmt(total_bltrfl$`Xanomeline High Dose_H`, size = 2, int_len = 2)
+
+
+
+  comb5 <- comb4 |>
+    rbind(total_bltrfl) |>
+    arrange(PARAM, ANRIND)
+
+  comb5$ANRIND <- as.character(recode(comb5$ANRIND,
+                                      "T" = "n",
+                                      "N" = "Normal",
+                                      "H" = "High"))
+
+  comb5[unlist(comb5[,2] == "n")[,1], 9] <- pvals
+  comb5 <- pad_row(comb5, which(comb5[,2] == "n")) |>
+    ungroup() |>
+    add_row("PARAM" = NA, .before = 1) |>
+    add_row("PARAM" = NA, .before = 1)
+  comb5 <- comb5 |>
+    add_row("PARAM" = NA, .before = 65) |>
+    add_row("PARAM" = NA, .before = 65)
+
+  comb5[!(unlist(comb5[,2]) %in% "n") , 1] <- NA
+
+  comb5 <- comb5[!apply(comb5, 1, function(x) {
+    all(x[4:9] ==  " 0      ") & all(x[3] == "High")
+  }), ]
+
+  comb5[,1] <- as.character(comb5$PARAM)
+  comb5[2,1] <- "CHEMISTRY"
+  comb5[3,1] <- "----------"
+  comb5[66,1] <- "HEMATOLOGY"
+  comb5[67,1] <- "----------"
+
+  names(comb5) <- c(
+    "",
+    "Shift\\line[1]",
+    "Normal at Baseline",
+    "High at Baseline",
+    "Normal at Baseline",
+    "High at Baseline",
+    "Normal at Baseline",
+    "High at Baseline",
+    "p-\\line value\\line[2]"
+  )
+
+
+  headers <- adsl |>
+    filter(ARM != "Screen Failure") |>
+    group_by(ARM) |>
+    summarise(N = n()) |>
+    mutate(label = paste0(recode(ARM,
+                                 "Placebo" = "Placebo",
+                                 "Xanomeline Low Dose" = "Xan. Low",
+                                 "Xanomeline High Dose" = "Xan. High"), " (N=", N, ")"))
+
+  ht <- comb5 |>
+    huxtable::as_hux(add_colnames=TRUE)
+
+  ht <- huxtable::as_hux(pad_row(as.data.frame(ht), c(1,1)), add_colnames = FALSE)
+  ht[1, 3] <- headers[1, "label"]
+  ht[1, 5] <- headers[3, "label"]
+  ht[1, 7] <- headers[2, "label"]
+
+  ht2 <- ht |>
+    huxtable::merge_cells(1, 3:4) |>
+    huxtable::merge_cells(1, 5:6) |>
+    huxtable::merge_cells(1, 7:8) |>
+    huxtable::set_bottom_border(2, 3:4, 1) |>
+    huxtable::set_bottom_border(2, 5:6, 1) |>
+    huxtable::set_bottom_border(2, 7:8, 1) |>
+    huxtable::set_bottom_border(3, 1:9, 1) |>
+    huxtable::set_width(1.5) |>
+    huxtable::set_escape_contents(FALSE) |>
+    huxtable::set_bold(1:3, 1:9, TRUE) |>
+    huxtable::set_valign(1:3, 1:9, "bottom") |>
+    huxtable::set_align(3, 1:9, "center") |>
+    huxtable::set_align(1, 1:9, "center") |>
+    huxtable::set_align(4:102, 9, "right") |>
+    huxtable::set_col_width(1:9, c(0.31, rep(0.09, 7), 0.06))
+
+  return(ht2)
+}
+
+
 #' gen_ht_t14_701
 #' Generate Table 14-7.01 Summary of Vital Signs at Baseline and End of Treatment
 #'

@@ -26,6 +26,7 @@ source(here("inst","examples","t-14-4-01.R"))
 source(here("inst","examples","t-14-5-01.R"))
 source(here("inst","examples","t-14-5-02.R"))
 
+source(here("inst","examples","t-14-6-01.R"))
 
 source(here("inst","examples","t-14-7-01.R"))
 source(here("inst","examples","t-14-7-02.R"))
