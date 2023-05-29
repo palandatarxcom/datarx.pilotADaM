@@ -5,7 +5,6 @@
 #' @param table_number
 #'
 #' @return
-#' @export
 #' @examples
 example_custom_reader <- function(..., table_number=NULL) {
   # If a column isn't populated then the type may be guessed wrong so force it
@@ -23,7 +22,6 @@ example_custom_reader <- function(..., table_number=NULL) {
 #' @param df
 #'
 #' @return
-#' @export
 #'
 #' @examples
 get_meta <- function(df) {
@@ -42,7 +40,6 @@ get_meta <- function(df) {
 #' @param trtpn
 #'
 #' @return
-#' @export
 #' @examples
 get_header_n <- function(.data, trtp = TRT01P, trtpn = TRT01PN) {
   # Extract header N's into a dataframe to be used on merges or for display
@@ -72,7 +69,6 @@ get_header_n <- function(.data, trtp = TRT01P, trtpn = TRT01PN) {
 #' @param int_len
 #'
 #' @return
-#' @export
 #'
 #' @examples
 num_fmt <- function(var, digits=0, size=10, int_len=3) {
@@ -115,7 +111,6 @@ num_fmt <- Vectorize(num_fmt)
 #' @param mark_lt
 #'
 #' @return
-#' @export
 #'
 #' @examples
 n_pct <- function(n, pct, n_width=3, pct_width=3, digits=0, mark_lt=TRUE) {
@@ -146,7 +141,6 @@ n_pct <- Vectorize(n_pct)
 #' @param pct_width
 #'
 #' @return
-#' @export
 #'
 #' @examples
 n_pct2 <- function(n, pct, n_width=3, pct_width=3) {
@@ -174,7 +168,6 @@ n_pct2 <- function(n, pct, n_width=3, pct_width=3) {
 #' @param header_n
 #'
 #' @return
-#' @export
 #'
 #' @importFrom dplyr filter
 #' @examples
@@ -227,8 +220,6 @@ sum_subgrp <- function(.data, subgroup_var, order_var = NULL, include.n=TRUE, pa
 #' @param include
 #'
 #' @return
-#' @export
-#'
 #'
 #' @examples
 desc_stats <- function(.data, var, group = TRT01PN, na.rm=TRUE, int_len=3, size=10, include=c('n', 'Mean', 'SD', 'Median', 'Min', 'Max')) {
@@ -272,7 +263,6 @@ desc_stats <- function(.data, var, group = TRT01PN, na.rm=TRUE, int_len=3, size=
 #' @param NL
 #'
 #' @return
-#' @export
 #'
 #' @examples
 invert.list <- function (NL) {
@@ -294,7 +284,7 @@ invert.list <- function (NL) {
 #' @param sort
 #'
 #' @return
-#' @export
+#'
 #' @importFrom tidyselect starts_with
 #' @examples
 ae_counts <- function(.data, ..., N_counts = NULL, sort=FALSE) {
@@ -372,7 +362,6 @@ ae_counts <- function(.data, ..., N_counts = NULL, sort=FALSE) {
 #' @param forumula
 #'
 #' @return
-#' @export
 #'
 #' @examples
 aov_p <- function(.data, forumula) {
@@ -395,7 +384,6 @@ aov_p <- function(.data, forumula) {
 #' @param categories
 #'
 #' @return
-#' @export
 #'
 #' @examples
 chi_p <- function(data, results, categories) {
@@ -421,7 +409,6 @@ chi_p <- function(data, results, categories) {
 #' @param width
 #'
 #' @return
-#' @export
 #'
 #' @examples
 fish_p <- function(.data, results, categories, width = 10) {
@@ -444,7 +431,6 @@ fish_p <- function(.data, results, categories, width = 10) {
 #' @param .data
 #'
 #' @return
-#' @export
 #'
 #' @examples
 fisher_test_ae <- function(.data) {
@@ -482,7 +468,6 @@ fisher_test_ae <- function(.data) {
 #' @param alternate
 #'
 #' @return
-#' @export
 #'
 #' @examples
 cmh_p <- function(.data, formula, alternate=c('rmeans', 'cmeans', 'general', 'cor')) {
@@ -542,7 +527,6 @@ pad_row2 <- function(df, r) {
 #' @param stub_header
 #'
 #' @return
-#' @export
 #'
 #' @examples
 summary_data <- function(data, var, week, stub_header) {
@@ -598,8 +582,6 @@ summary_data <- function(data, var, week, stub_header) {
 #' @param model_type
 #'
 #' @return
-#' @export
-#'
 #'
 #' @examples
 efficacy_models <- function(data, var=NULL, wk=NULL, model_type='ancova') {
