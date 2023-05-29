@@ -8,7 +8,12 @@ Generate Table 14-7.01 Summary of Vital Signs at Baseline and End of Treatment}
 gen_ht_t14_701(adsl, advs)
 }
 \arguments{
-\item{advs}{}
+\item{adsl}{ADSL}
+
+\item{advs}{ADVS}
+}
+\value{
+a huxtable
 }
 \description{
 gen_ht_t14_701

@@ -7,9 +7,6 @@ P-vaule for fisher's test}
 \usage{
 fish_p(.data, results, categories, width = 10)
 }
-\arguments{
-\item{width}{}
-}
 \description{
 fish_p
 P-vaule for fisher's test

@@ -9,6 +9,9 @@ get_meta(df)
 \arguments{
 \item{df}{}
 }
+\value{
+name with label
+}
 \description{
 get_meta
 }

@@ -8,7 +8,12 @@ Generate Table 14-7.02 Summary of Vital Signs Change from Baseline at End of Tre
 gen_ht_t14_702(adsl, advs)
 }
 \arguments{
-\item{advs}{}
+\item{adsl}{ADSL}
+
+\item{advs}{ADVS}
+}
+\value{
+a huxtable
 }
 \description{
 gen_ht_t14_702

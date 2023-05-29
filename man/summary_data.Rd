@@ -7,9 +7,6 @@ Create the summary data portion for 14-3.01}
 \usage{
 summary_data(data, var, week, stub_header)
 }
-\arguments{
-\item{stub_header}{}
-}
 \description{
 summary_data
 Create the summary data portion for 14-3.01

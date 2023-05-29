@@ -7,9 +7,6 @@ CMH test p-value with options for alternate hyptheses}
 \usage{
 cmh_p(.data, formula, alternate = c("rmeans", "cmeans", "general", "cor"))
 }
-\arguments{
-\item{alternate}{}
-}
 \description{
 cmh_p
 CMH test p-value with options for alternate hyptheses

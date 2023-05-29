@@ -8,7 +8,9 @@ Generate Table 14-5.02 Incidence of Treatment Emergent Serious Adverse Events by
 gen_ht_t14_502(adae, adsl)
 }
 \arguments{
-\item{adsl}{}
+\item{adae}{ADAE}
+
+\item{adsl}{ADSL}
 }
 \value{
 a huxtable
@@ -16,4 +18,8 @@ a huxtable
 \description{
 gen_ht_t14_502
 Generate Table 14-5.02 Incidence of Treatment Emergent Serious Adverse Events by Treatment Group
+}
+\examples{
+gen_ht_t14_502(adae = adae, adsl = adsl)
+
 }

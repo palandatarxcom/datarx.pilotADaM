@@ -7,9 +7,6 @@ P-value for anova test}
 \usage{
 aov_p(.data, forumula)
 }
-\arguments{
-\item{forumula}{}
-}
 \description{
 aov_p
 P-value for anova test

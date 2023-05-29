@@ -2,16 +2,20 @@
 % Please edit documentation in R/genTables.R
 \name{gen_ht_t14_601}
 \alias{gen_ht_t14_601}
-\title{gen_ht_t14_601}
+\title{gen_ht_t14_601
+Generate Table 14-6.01 Summary Statistics for Continuous Laboratory Values}
 \usage{
 gen_ht_t14_601(adlbc, adlbh)
 }
 \arguments{
-\item{adlbh}{}
+\item{adlbc}{ADLBC}
+
+\item{adlbh}{ADLBH}
 }
 \value{
 a huxtable
 }
 \description{
+gen_ht_t14_601
 Generate Table 14-6.01 Summary Statistics for Continuous Laboratory Values
 }

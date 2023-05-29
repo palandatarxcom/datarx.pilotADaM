@@ -7,9 +7,6 @@ Count of subjects with an adverse event}
 \usage{
 ae_counts(.data, ..., N_counts = NULL, sort = FALSE)
 }
-\arguments{
-\item{sort}{}
-}
 \description{
 ae_counts
 Count of subjects with an adverse event

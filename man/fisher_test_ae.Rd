@@ -2,15 +2,12 @@
 % Please edit documentation in R/utils_helpers.R
 \name{fisher_test_ae}
 \alias{fisher_test_ae}
-\title{Title
+\title{fisher_test_ae
 Fisher test built for row-wise derivations suited for our AE tables}
 \usage{
 fisher_test_ae(.data)
 }
-\arguments{
-\item{.data}{}
-}
 \description{
-Title
+fisher_test_ae
 Fisher test built for row-wise derivations suited for our AE tables
 }

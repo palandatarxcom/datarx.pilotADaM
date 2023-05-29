@@ -2,13 +2,18 @@
 % Please edit documentation in R/genTables.R
 \name{gen_ht_t14_311}
 \alias{gen_ht_t14_311}
-\title{gen_ht_t14_311}
+\title{gen_ht_t14_311
+Generate Table 14-3.11 ADAS Cog (11) - Repeated Measures Analysis of Change from Baseline to Week 24}
 \usage{
 gen_ht_t14_311(adadas)
 }
 \arguments{
-\item{adadas}{Generate Table 14-3.11 ADAS Cog (11) - Repeated Measures Analysis of Change from Baseline to Week 24}
+\item{adadas}{ADADAS}
+}
+\value{
+a huxtable
 }
 \description{
 gen_ht_t14_311
+Generate Table 14-3.11 ADAS Cog (11) - Repeated Measures Analysis of Change from Baseline to Week 24
 }

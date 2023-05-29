@@ -1,11 +1,4 @@
 
-#' example_custom_reader
-#'
-#' @param ...
-#' @param table_number
-#'
-#' @return
-#' @examples
 example_custom_reader <- function(..., table_number=NULL) {
   # If a column isn't populated then the type may be guessed wrong so force it
   col_types <- c('text', 'numeric', 'text', 'text', 'text', 'text', 'logical', 'logical', 'text')
@@ -21,9 +14,8 @@ example_custom_reader <- function(..., table_number=NULL) {
 #'
 #' @param df
 #'
-#' @return
+#' @return name with label
 #'
-#' @examples
 get_meta <- function(df) {
   # Examines the metadata of a SAS imported tibble
   for (name in names(df)) {
@@ -33,14 +25,6 @@ get_meta <- function(df) {
   }
 }
 
-#' get_header_n
-#'
-#' @param .data
-#' @param trtp
-#' @param trtpn
-#'
-#' @return
-#' @examples
 get_header_n <- function(.data, trtp = TRT01P, trtpn = TRT01PN) {
   # Extract header N's into a dataframe to be used on merges or for display
 
@@ -61,16 +45,6 @@ get_header_n <- function(.data, trtp = TRT01P, trtpn = TRT01PN) {
     select(-!!trtp, -trtp)
 }
 
-#' num_fmt
-#'
-#' @param var
-#' @param digits
-#' @param size
-#' @param int_len
-#'
-#' @return
-#'
-#' @examples
 num_fmt <- function(var, digits=0, size=10, int_len=3) {
   # Formats summary stat strings to align display correctly
 
@@ -101,18 +75,6 @@ num_fmt <- function(var, digits=0, size=10, int_len=3) {
 
 num_fmt <- Vectorize(num_fmt)
 
-#' n_pct
-#'
-#' @param n
-#' @param pct
-#' @param n_width
-#' @param pct_width
-#' @param digits
-#' @param mark_lt
-#'
-#' @return
-#'
-#' @examples
 n_pct <- function(n, pct, n_width=3, pct_width=3, digits=0, mark_lt=TRUE) {
   # n (%) formatted string. e.g. 50 ( 75%)
   res <- n / pct
@@ -133,16 +95,6 @@ n_pct <- function(n, pct, n_width=3, pct_width=3, digits=0, mark_lt=TRUE) {
 
 n_pct <- Vectorize(n_pct)
 
-#' n_pct2
-#'
-#' @param n
-#' @param pct
-#' @param n_width
-#' @param pct_width
-#'
-#' @return
-#'
-#' @examples
 n_pct2 <- function(n, pct, n_width=3, pct_width=3) {
   n <- unlist(n)
   pct <- unique(pct)
@@ -158,19 +110,6 @@ n_pct2 <- function(n, pct, n_width=3, pct_width=3) {
   }))
 }
 
-#' sum_subgrp
-#'
-#' @param .data
-#' @param subgroup_var
-#' @param order_var
-#' @param include.n
-#' @param pad.row
-#' @param header_n
-#'
-#' @return
-#'
-#' @importFrom dplyr filter
-#' @examples
 sum_subgrp <- function(.data, subgroup_var, order_var = NULL, include.n=TRUE, pad.row=TRUE, header_n = header_n) {
   # Create n (%) subgroups by TRT01P
 
@@ -178,7 +117,7 @@ sum_subgrp <- function(.data, subgroup_var, order_var = NULL, include.n=TRUE, pa
   subgrps <- .data |>
     # Keep only the gtwo group variables and group by
     select(TRT01PN, {{ subgroup_var }}, {{ order_var }}) |>
-    filter(!is.na({{ subgroup_var }})) |>
+    dplyr::filter(!is.na({{ subgroup_var }})) |>
     group_by(TRT01PN, {{ subgroup_var }}, {{ order_var }}) |>
     # Summarize counts
     summarize(
@@ -209,19 +148,6 @@ sum_subgrp <- function(.data, subgroup_var, order_var = NULL, include.n=TRUE, pa
 
 }
 
-#' desc_stats
-#'
-#' @param .data
-#' @param var
-#' @param group
-#' @param na.rm
-#' @param int_len
-#' @param size
-#' @param include
-#'
-#' @return
-#'
-#' @examples
 desc_stats <- function(.data, var, group = TRT01PN, na.rm=TRUE, int_len=3, size=10, include=c('n', 'Mean', 'SD', 'Median', 'Min', 'Max')) {
   # Provides descriptive statistics of provided variable, by TRT01PN
   # n, Mean, SD, Median, Min, Max
@@ -257,14 +183,6 @@ desc_stats <- function(.data, var, group = TRT01PN, na.rm=TRUE, int_len=3, size=
     pad_row()
 }
 
-#' invert.list
-#' Invert a list's items and names (assuming it's key value)
-#'
-#' @param NL
-#'
-#' @return
-#'
-#' @examples
 invert.list <- function (NL) {
   # Invert a list's items and names (assuming it's key value)
   L <- list()
@@ -278,15 +196,7 @@ invert.list <- function (NL) {
 #' ae_counts
 #' Count of subjects with an adverse event
 #'
-#' @param .data
-#' @param ...
-#' @param N_counts
-#' @param sort
-#'
-#' @return
-#'
 #' @importFrom tidyselect starts_with
-#' @examples
 ae_counts <- function(.data, ..., N_counts = NULL, sort=FALSE) {
 
   # Get the grouping
@@ -358,12 +268,6 @@ ae_counts <- function(.data, ..., N_counts = NULL, sort=FALSE) {
 #' aov_p
 #' P-value for anova test
 #'
-#' @param .data
-#' @param forumula
-#'
-#' @return
-#'
-#' @examples
 aov_p <- function(.data, forumula) {
   # Run the anova test
   a <- stats::aov(forumula, .data, na.action=stats::na.omit)
@@ -379,13 +283,6 @@ aov_p <- function(.data, forumula) {
 #' chi_p
 #' P-value for chi-squared
 #'
-#' @param data
-#' @param results
-#' @param categories
-#'
-#' @return
-#'
-#' @examples
 chi_p <- function(data, results, categories) {
   # get the arguments as a off of the function call
   arguments <- as.list(match.call())
@@ -403,14 +300,6 @@ chi_p <- function(data, results, categories) {
 #' fish_p
 #' P-vaule for fisher's test
 #'
-#' @param .data
-#' @param results
-#' @param categories
-#' @param width
-#'
-#' @return
-#'
-#' @examples
 fish_p <- function(.data, results, categories, width = 10) {
   # get the arguments as a off of the function call
   arguments <- as.list(match.call())
@@ -425,14 +314,9 @@ fish_p <- function(.data, results, categories, width = 10) {
 }
 
 
-#' Title
+#' fisher_test_ae
 #' Fisher test built for row-wise derivations suited for our AE tables
 #'
-#' @param .data
-#'
-#' @return
-#'
-#' @examples
 fisher_test_ae <- function(.data) {
 
   # If there were no events in either treatment arm then don't compute
@@ -463,13 +347,6 @@ fisher_test_ae <- function(.data) {
 #' cmh_p
 #' CMH test p-value with options for alternate hyptheses
 #'
-#' @param .data
-#' @param formula
-#' @param alternate
-#'
-#' @return
-#'
-#' @examples
 cmh_p <- function(.data, formula, alternate=c('rmeans', 'cmeans', 'general', 'cor')) {
   # !!! NOTE: To obtain the same p-value used in SAS for this display, a modification had to be made to the vcdExtra library.
   #           Please refer to this github issue: https://github.com/friendly/vcdExtra/issues/3
@@ -521,14 +398,6 @@ pad_row2 <- function(df, r) {
 #' summary_data
 #' Create the summary data portion for 14-3.01
 #'
-#' @param data
-#' @param var
-#' @param week
-#' @param stub_header
-#'
-#' @return
-#'
-#' @examples
 summary_data <- function(data, var, week, stub_header) {
 
   # Get the summary statistics
@@ -576,14 +445,6 @@ summary_data <- function(data, var, week, stub_header) {
 
 #' efficacy_models
 #'
-#' @param data
-#' @param var
-#' @param wk
-#' @param model_type
-#'
-#' @return
-#'
-#' @examples
 efficacy_models <- function(data, var=NULL, wk=NULL, model_type='ancova') {
 
   if (model_type == 'ancova') {

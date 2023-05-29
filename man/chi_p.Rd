@@ -7,9 +7,6 @@ P-value for chi-squared}
 \usage{
 chi_p(data, results, categories)
 }
-\arguments{
-\item{categories}{}
-}
 \description{
 chi_p
 P-value for chi-squared

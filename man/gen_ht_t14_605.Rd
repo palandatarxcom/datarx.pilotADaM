@@ -2,16 +2,22 @@
 % Please edit documentation in R/genTables.R
 \name{gen_ht_t14_605}
 \alias{gen_ht_t14_605}
-\title{gen_ht_t14_605}
+\title{gen_ht_t14_605
+Generate Table 14-6.05 Shifts of Laboratory Values During Treatment, Categorized Based on Threshold Ranges}
 \usage{
 gen_ht_t14_605(adlbc, adlbh, adsl)
 }
 \arguments{
-\item{adsl}{}
+\item{adlbc}{ADLBC}
+
+\item{adlbh}{ADLBH}
+
+\item{adsl}{ADSL}
 }
 \value{
 a huxtable
 }
 \description{
+gen_ht_t14_605
 Generate Table 14-6.05 Shifts of Laboratory Values During Treatment, Categorized Based on Threshold Ranges
 }

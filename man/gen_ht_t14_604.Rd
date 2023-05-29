@@ -7,7 +7,11 @@
 gen_ht_t14_604(adlbc, adlbh, adsl)
 }
 \arguments{
-\item{adsl}{}
+\item{adlbc}{ADLBC}
+
+\item{adlbh}{ADLBH}
+
+\item{adsl}{ADSL}
 }
 \value{
 a huxtable

@@ -8,6 +8,7 @@
 #' @export
 #'
 #' @examples
+#' gen_ht_t14_101(adsl = adsl)
 #'
 gen_ht_t14_101 <- function(adsl) {
   # Create the total values upfront for quicker summary ----
@@ -81,6 +82,7 @@ gen_ht_t14_101 <- function(adsl) {
 #' @export
 #'
 #' @examples
+#' gen_ht_t14_102(adsl = adsl)
 #'
 gen_ht_t14_102 <- function(adsl) {
   adsl_ <- adsl
@@ -226,6 +228,7 @@ gen_ht_t14_102 <- function(adsl) {
 #' @export
 #'
 #' @examples
+#' gen_ht_t14_103(adsl = adsl)
 #'
 gen_ht_t14_103 <- function(adsl) {
   adsl$SITEGR1 <- ordered(adsl$SITEGR1, c(
@@ -406,6 +409,8 @@ gen_ht_t14_103 <- function(adsl) {
 #' @export
 #'
 #' @examples
+#' gen_ht_t14_201(adsl)
+#'
 gen_ht_t14_201 <- function(adsl) {
   adsl <- adsl |>
     filter(ITTFL == "Y") |>
@@ -623,6 +628,8 @@ gen_ht_t14_201 <- function(adsl) {
 #' @export
 #'
 #' @examples
+#' gen_ht_t14_301(adadas = adadas)
+#'
 gen_ht_t14_301 <- function(adadas) {
   adas <- adam_adadas |>
     filter(EFFFL == "Y" & ITTFL=='Y' & PARAMCD == 'ACTOT' & ANL01FL == 'Y')
@@ -671,7 +678,6 @@ gen_ht_t14_301 <- function(adadas) {
 #' @return a huxtable
 #' @export
 #'
-#' @examples
 gen_ht_t14_302 <- function(adcibc) {
   cibc <- adcibc |>
     filter(EFFFL == "Y" & ITTFL=='Y' & PARAMCD == 'CIBICVAL' & ANL01FL == 'Y')
@@ -715,10 +721,9 @@ gen_ht_t14_302 <- function(adcibc) {
 #'
 #' @param adadas
 #'
-#' @return
+#' @return a huxtable
 #' @export
 #'
-#' @examples
 gen_ht_t14_303 <- function(adadas) {
   adas <- adadas |>
     filter(EFFFL == "Y" & ITTFL=='Y' & PARAMCD == 'ACTOT' & ANL01FL == 'Y')
@@ -767,7 +772,6 @@ gen_ht_t14_303 <- function(adadas) {
 #' @return a huxtable
 #' @export
 #'
-#' @examples
 gen_ht_t14_304 <- function(adcibc) {
   cibc <- adcibc |>
     filter(EFFFL == "Y" & ITTFL=='Y' & PARAMCD == 'CIBICVAL' & ANL01FL == 'Y')
@@ -814,7 +818,6 @@ gen_ht_t14_304 <- function(adcibc) {
 #' @return a huxtable
 #' @export
 #'
-#' @examples
 gen_ht_t14_305 <- function(adadas) {
   adas <- adadas |>
     filter(EFFFL == "Y" & ITTFL=='Y' & PARAMCD == 'ACTOT' & ANL01FL == 'Y')
@@ -863,7 +866,6 @@ gen_ht_t14_305 <- function(adadas) {
 #' @return a huxtable
 #' @export
 #'
-#' @examples
 gen_ht_t14_306 <- function(adcibc) {
   cibc <- adcibc |>
     filter(EFFFL == "Y" & ITTFL=='Y' & PARAMCD == 'CIBICVAL' & ANL01FL == 'Y')
@@ -910,7 +912,6 @@ gen_ht_t14_306 <- function(adcibc) {
 #' @return a huxtable
 #' @export
 #'
-#' @examples
 gen_ht_t14_307 <- function(adadas) {
   adas <- adadas |>
     filter(COMP24FL == "Y" & EFFFL=='Y' & PARAMCD == 'ACTOT' & ANL01FL == 'Y' & DTYPE != 'LOCF')
@@ -959,7 +960,6 @@ gen_ht_t14_307 <- function(adadas) {
 #' @return a huxtable
 #' @export
 #'
-#' @examples
 gen_ht_t14_308 <- function(adadas) {
   adas <- adadas |>
     filter(EFFFL=='Y' & PARAMCD == 'ACTOT' & ANL01FL == 'Y' & SEX == "M")
@@ -1005,10 +1005,9 @@ gen_ht_t14_308 <- function(adadas) {
 #'
 #' @param adadas
 #'
-#' @return
+#' @return a huxtable
 #' @export
 #'
-#' @examples
 gen_ht_t14_309 <- function(adadas) {
   adas <- adadas |>
     filter(EFFFL == "Y" & PARAMCD == 'ACTOT' & ANL01FL == 'Y' & SEX == "F")
@@ -1056,7 +1055,6 @@ gen_ht_t14_309 <- function(adadas) {
 #' @return a huxtable
 #' @export
 #'
-#' @examples
 gen_ht_t14_310 <- function(adadas) {
   adas <- adadas |>
     filter(EFFFL == "Y" & PARAMCD == "ACTOT" & ITTFL == "Y" & AVISITN %in% c(0, 8, 16, 24) & ANL01FL=="Y") |>
@@ -1165,14 +1163,13 @@ gen_ht_t14_310 <- function(adadas) {
 
 
 #' gen_ht_t14_311
-#'
-#' @param adadas
 #' Generate Table 14-3.11 ADAS Cog (11) - Repeated Measures Analysis of Change from Baseline to Week 24
 #'
-#' @return
+#' @param adadas ADADAS
+#'
+#' @return a huxtable
 #' @export
 #'
-#' @examples
 gen_ht_t14_311 <- function(adadas) {
   adas <- adadas |>
     filter(EFFFL == "Y" & PARAMCD == 'ACTOT' & ANL01FL == 'Y' & DTYPE != 'LOCF' & AVISITN > 0)
@@ -1219,7 +1216,6 @@ gen_ht_t14_311 <- function(adadas) {
 #' @return a huxtable
 #' @export
 #'
-#' @examples
 gen_ht_t14_312 <- function(adnpix) {
   npix <- adnpix %>%
     filter(EFFFL == 'Y' & ITTFL == 'Y' & PARAMCD == 'NPTOTMN') %>%
@@ -1267,7 +1263,6 @@ gen_ht_t14_312 <- function(adnpix) {
 #' @return a huxtable
 #' @export
 #'
-#' @examples
 gen_ht_t14_313 <- function(adadcibc) {
   ord <- tibble(
     AVALC = rep(c('n',
@@ -1394,6 +1389,7 @@ gen_ht_t14_313 <- function(adadcibc) {
 
 
 #' gen_ht_t14_401
+#'
 #' Generate Table 14-4.01 Summary of Planned Exposure to Study Drug, as of End of Study
 #'
 #' @param adsl
@@ -1401,7 +1397,6 @@ gen_ht_t14_313 <- function(adadcibc) {
 #' @return a huxtable
 #' @export
 #'
-#' @examples
 gen_ht_t14_401 <- function(adsl) {
   # Subset for completers
   adsl_complt <- adsl |>
@@ -1472,15 +1467,15 @@ gen_ht_t14_401 <- function(adsl) {
 
 
 #' gen_ht_t14_501
+#'
 #' Generate Table 14-5.01 Incidence of Treatment Emergent Adverse Events by Treatment Group
 #'
-#' @param adae
-#' @param adsl
+#' @param adae ADAE
+#' @param adsl ADSL
 #'
 #' @return a huxtable
 #' @export
 #'
-#' @examples
 gen_ht_t14_501 <- function(adae, adsl) {
   adae <- adae |>
     filter(SAFFL == 'Y' & TRTEMFL == 'Y')
@@ -1565,13 +1560,15 @@ gen_ht_t14_501 <- function(adae, adsl) {
 #' gen_ht_t14_502
 #' Generate Table 14-5.02 Incidence of Treatment Emergent Serious Adverse Events by Treatment Group
 #'
-#' @param adae
-#' @param adsl
+#' @param adae ADAE
+#' @param adsl ADSL
 #'
 #' @return a huxtable
 #' @export
 #'
 #' @examples
+#' gen_ht_t14_502(adae = adae, adsl = adsl)
+#'
 gen_ht_t14_502 <- function(adae, adsl) {
   adae <- adae |>
     filter(SAFFL == 'Y' & TRTEMFL == 'Y' & AESER == 'Y')
@@ -1653,16 +1650,14 @@ gen_ht_t14_502 <- function(adae, adsl) {
 
 
 #' gen_ht_t14_601
-#'
 #' Generate Table 14-6.01 Summary Statistics for Continuous Laboratory Values
 #'
-#' @param adlbc
-#' @param adlbh
+#' @param adlbc ADLBC
+#' @param adlbh ADLBH
 #'
 #' @return a huxtable
 #' @export
 #'
-#' @examples
 gen_ht_t14_601 <- function(adlbc, adlbh) {
   adlbc <- adlbc |>
     filter(SAFFL == 'Y' & (AVISITN != 99 | (AVISITN == 99 & AENTMTFL=='Y')))
@@ -1839,14 +1834,13 @@ gen_ht_t14_601 <- function(adlbc, adlbh) {
 #'
 #' Generate Table 14-6.04 Shifts of Laboratory Values During Treatment, Categorized Based on Threshold Ranges, by Visit
 #'
-#' @param adlbc
-#' @param adlbh
-#' @param adsl
+#' @param adlbc ADLBC
+#' @param adlbh ADLBH
+#' @param adsl ADSL
 #'
 #' @return a huxtable
 #' @export
 #'
-#' @examples
 gen_ht_t14_604 <- function(adlbc, adlbh, adsl) {
 
   pad_row <- function(df, r) {
@@ -2088,17 +2082,15 @@ gen_ht_t14_604 <- function(adlbc, adlbh, adsl) {
 
 
 #' gen_ht_t14_605
-#'
 #' Generate Table 14-6.05 Shifts of Laboratory Values During Treatment, Categorized Based on Threshold Ranges
 #'
-#' @param adlbc
-#' @param adlbh
-#' @param adsl
+#' @param adlbc ADLBC
+#' @param adlbh ADLBH
+#' @param adsl ADSL
 #'
 #' @return a huxtable
 #' @export
 #'
-#' @examples
 gen_ht_t14_605 <- function(adlbc, adlbh, adsl) {
 
   pad_row <- function(df, r) {
@@ -2349,13 +2341,12 @@ gen_ht_t14_605 <- function(adlbc, adlbh, adsl) {
 #' gen_ht_t14_701
 #' Generate Table 14-7.01 Summary of Vital Signs at Baseline and End of Treatment
 #'
-#' @param adsl
-#' @param advs
+#' @param adsl ADSL
+#' @param advs ADVS
 #'
-#' @return
+#' @return a huxtable
 #' @export
 #'
-#' @examples
 gen_ht_t14_701 <- function(adsl, advs) {
   advs <- advs |>
     filter(SAFFL == "Y", ANL01FL == "Y")
@@ -2473,13 +2464,12 @@ gen_ht_t14_701 <- function(adsl, advs) {
 #' gen_ht_t14_702
 #' Generate Table 14-7.02 Summary of Vital Signs Change from Baseline at End of Treatment
 #'
-#' @param adsl
-#' @param advs
+#' @param adsl ADSL
+#' @param advs ADVS
 #'
-#' @return
+#' @return a huxtable
 #' @export
 #'
-#' @examples
 gen_ht_t14_702 <- function(adsl, advs) {
   advs <- advs |>
     filter(SAFFL == "Y" & !is.na(BASE))
@@ -2576,13 +2566,12 @@ gen_ht_t14_702 <- function(adsl, advs) {
 #' gen_ht_t14_703
 #' Generate Table 14-7.03 Summary of Weight Change from Baseline at End of Treatment
 #'
-#' @param advs
-#' @param adsl
+#' @param advs ADVS
+#' @param adsl ADSL
 #'
 #' @return a huxtable
 #' @export
 #'
-#' @examples
 gen_ht_t14_703 <- function(advs, adsl) {
   advs <- advs |>
     filter(PARAM == "Weight (kg)")
@@ -2723,13 +2712,12 @@ gen_ht_t14_703 <- function(advs, adsl) {
 #' gen_ht_t14_704
 #' Generate Table 14-7.04 Summary of Concomitant Medications (Number of Subjects)
 #'
-#' @param sdtm_cm
-#' @param adsl
+#' @param sdtm_cm  SDTM CM
+#' @param adsl ADSL
 #'
-#' @return
+#' @return a haxtable
 #' @export
 #'
-#' @examples
 gen_ht_t14_704 <- function(sdtm_cm, adsl) {
 
   n_pct <- function(n, pct) {

@@ -10,6 +10,9 @@ gen_ht_t14_309(adadas)
 \arguments{
 \item{adadas}{}
 }
+\value{
+a huxtable
+}
 \description{
 gen_ht_t14_309
 Generate Table 14-3.09 ADAS Cog (11) - Change from Baseline to Week 24 in Female Subjects - LOCF

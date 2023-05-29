@@ -2,8 +2,7 @@
 % Please edit documentation in R/genTables.R
 \name{gen_ht_t14_401}
 \alias{gen_ht_t14_401}
-\title{gen_ht_t14_401
-Generate Table 14-4.01 Summary of Planned Exposure to Study Drug, as of End of Study}
+\title{gen_ht_t14_401}
 \usage{
 gen_ht_t14_401(adsl)
 }
@@ -14,6 +13,5 @@ gen_ht_t14_401(adsl)
 a huxtable
 }
 \description{
-gen_ht_t14_401
 Generate Table 14-4.01 Summary of Planned Exposure to Study Drug, as of End of Study
 }

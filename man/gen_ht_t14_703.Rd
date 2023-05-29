@@ -8,7 +8,9 @@ Generate Table 14-7.03 Summary of Weight Change from Baseline at End of Treatmen
 gen_ht_t14_703(advs, adsl)
 }
 \arguments{
-\item{adsl}{}
+\item{advs}{ADVS}
+
+\item{adsl}{ADSL}
 }
 \value{
 a huxtable

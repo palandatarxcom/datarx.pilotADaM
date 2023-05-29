@@ -2,18 +2,18 @@
 % Please edit documentation in R/genTables.R
 \name{gen_ht_t14_501}
 \alias{gen_ht_t14_501}
-\title{gen_ht_t14_501
-Generate Table 14-5.01 Incidence of Treatment Emergent Adverse Events by Treatment Group}
+\title{gen_ht_t14_501}
 \usage{
 gen_ht_t14_501(adae, adsl)
 }
 \arguments{
-\item{adsl}{}
+\item{adae}{ADAE}
+
+\item{adsl}{ADSL}
 }
 \value{
 a huxtable
 }
 \description{
-gen_ht_t14_501
 Generate Table 14-5.01 Incidence of Treatment Emergent Adverse Events by Treatment Group
 }

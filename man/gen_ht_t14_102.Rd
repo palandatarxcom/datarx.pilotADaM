@@ -17,3 +17,7 @@ a huxtable table
 gen_ht_t14_102
 Generate Table 14-1.02 Summary of End of Study Data
 }
+\examples{
+gen_ht_t14_102(adsl = adsl)
+
+}

@@ -6,9 +6,6 @@
 \usage{
 efficacy_models(data, var = NULL, wk = NULL, model_type = "ancova")
 }
-\arguments{
-\item{model_type}{}
-}
 \description{
 efficacy_models
 }

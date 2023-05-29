@@ -10,6 +10,9 @@ gen_ht_t14_303(adadas)
 \arguments{
 \item{adadas}{}
 }
+\value{
+a huxtable
+}
 \description{
 gen_ht_t14_303
 Generate Table 14-3.03 ADAS Cog (11) - Change from Baseline to Week 8 - LOCF

@@ -8,7 +8,12 @@ Generate Table 14-7.04 Summary of Concomitant Medications (Number of Subjects)}
 gen_ht_t14_704(sdtm_cm, adsl)
 }
 \arguments{
-\item{adsl}{}
+\item{sdtm_cm}{SDTM CM}
+
+\item{adsl}{ADSL}
+}
+\value{
+a haxtable
 }
 \description{
 gen_ht_t14_704
