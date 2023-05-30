@@ -11,25 +11,15 @@ AEplot(data, paramVar, aeStartVar, aeEndVar, colorVar)
 
 \item{paramVar}{AE Preferred Term Column AETERM}
 
-\item{aeStartVar}{AE Start day column}
+\item{aeStartVar}{AE Start day column, ASTDY}
 
-\item{aeEndVar}{AE End day column}
+\item{aeEndVar}{AE End day column, AENDY}
 
-\item{colorVar}{AE Severity}
+\item{colorVar}{AE Severity, AESEV}
 }
 \value{
 an AE  plot created with ggplot
 }
 \description{
 Create AEplot
-}
-\examples{
-AEplot(
-  data = safetyData::adam_adae,
-  paramVar = "AETERM",
-  aeStartVar = "ASTDY",
-  aeEndVar = "AENDY",
-  colorVar = "AENDY"
-)
-
 }

@@ -19,7 +19,3 @@ a huxtable
 gen_ht_t14_502
 Generate Table 14-5.02 Incidence of Treatment Emergent Serious Adverse Events by Treatment Group
 }
-\examples{
-gen_ht_t14_502(adae = adae, adsl = adsl)
-
-}

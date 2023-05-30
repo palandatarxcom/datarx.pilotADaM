@@ -7,9 +7,6 @@
 #' @return a huxtable table
 #' @export
 #'
-#' @examples
-#' gen_ht_t14_101(adsl = adsl)
-#'
 gen_ht_t14_101 <- function(adsl) {
   # Create the total values upfront for quicker summary ----
   adsl_ <- adsl |>
@@ -80,9 +77,6 @@ gen_ht_t14_101 <- function(adsl) {
 #'
 #' @return a huxtable table
 #' @export
-#'
-#' @examples
-#' gen_ht_t14_102(adsl = adsl)
 #'
 gen_ht_t14_102 <- function(adsl) {
   adsl_ <- adsl
@@ -226,9 +220,6 @@ gen_ht_t14_102 <- function(adsl) {
 #'
 #' @return a huxtable table
 #' @export
-#'
-#' @examples
-#' gen_ht_t14_103(adsl = adsl)
 #'
 gen_ht_t14_103 <- function(adsl) {
   adsl$SITEGR1 <- ordered(adsl$SITEGR1, c(
@@ -407,9 +398,6 @@ gen_ht_t14_103 <- function(adsl) {
 #'
 #' @return a huxtable table
 #' @export
-#'
-#' @examples
-#' gen_ht_t14_201(adsl)
 #'
 gen_ht_t14_201 <- function(adsl) {
   adsl <- adsl |>
@@ -626,9 +614,6 @@ gen_ht_t14_201 <- function(adsl) {
 #'
 #' @return a huxtable
 #' @export
-#'
-#' @examples
-#' gen_ht_t14_301(adadas = adadas)
 #'
 gen_ht_t14_301 <- function(adadas) {
   adas <- adam_adadas |>
@@ -1565,9 +1550,6 @@ gen_ht_t14_501 <- function(adae, adsl) {
 #'
 #' @return a huxtable
 #' @export
-#'
-#' @examples
-#' gen_ht_t14_502(adae = adae, adsl = adsl)
 #'
 gen_ht_t14_502 <- function(adae, adsl) {
   adae <- adae |>

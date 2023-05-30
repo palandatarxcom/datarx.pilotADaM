@@ -7,8 +7,6 @@
 #' @param id Shiny module id
 #' @param current_id current selected id
 #'
-#' @import purrr
-#'
 #' @return A reactive containing the selected column
 #'
 #' @export
@@ -43,9 +41,9 @@ OverviewServer <- function(id, params, current_id) {
     demogHTML <- reactive({
       demogCols <- params()$settings$dm[grep("_col", names(params()$settings$dm))]
       names <- names(demogCols)
-      vals <- list(demogCols |> map_chr(~ as.character(demogData()[1, .x]))) |> unlist()
+      vals <- list(demogCols |> purrr::map_chr(~ as.character(demogData()[1, .x]))) |> unlist()
       names(vals) <- names
-      lis <- vals |> imap(function(val, name) {
+      lis <- vals |> purrr::imap(function(val, name) {
         tags$li(
           tags$small(name, class = "dlabel"),
           tags$strong(val, class = "dvalue")
@@ -65,8 +63,8 @@ OverviewServer <- function(id, params, current_id) {
 
       params()$data[[input$domainSelect]]
     })
-    output$overview <- renderDT({
-      domain_choice() |> filter(!!sym(id_col()) == current_id())
+    output$overview <- DT::renderDT({
+      domain_choice() |> dplyr::filter(!!sym(id_col()) == current_id())
     })
   })
 }

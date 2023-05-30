@@ -2,22 +2,14 @@
 #'
 #' @param data AE data frame
 #' @param paramVar AE Preferred Term Column AETERM
-#' @param aeStartVar AE Start day column
-#' @param aeEndVar AE End day column
-#' @param colorVar 	AE Severity
+#' @param aeStartVar AE Start day column, ASTDY
+#' @param aeEndVar AE End day column, AENDY
+#' @param colorVar 	AE Severity, AESEV
 #'
 #' @import ggplot2
 #' @return an AE  plot created with ggplot
-#' @export
 #'
-#' @examples
-#' AEplot(
-#'   data = safetyData::adam_adae,
-#'   paramVar = "AETERM",
-#'   aeStartVar = "ASTDY",
-#'   aeEndVar = "AENDY",
-#'   colorVar = "AENDY"
-#' )
+#' @export
 #'
 AEplot <- function(data, paramVar, aeStartVar, aeEndVar, colorVar) {
   x_lower_limit <- min(data[[aeStartVar]])

@@ -8,6 +8,7 @@
 #' @param current_id current selected id
 #'
 #'
+#'#' @import shiny
 #' @return Reactive containing AE plot and listing
 #'
 
@@ -38,9 +39,9 @@ ae_plot_server <- function(id, params, current_id) {
 
     output$AEplot <- renderPlot({
       aes_data <- NULL
-      if (!nrow(params()$data$aes |> filter(!!sym(id_col()) == current_id())) == 0) {
+      if (!nrow(params()$data$aes |> dplyr::filter(!!sym(id_col()) == current_id())) == 0) {
         AEplot(
-          data = params()$data$aes |> filter(!!sym(id_col()) == current_id()),
+          data = params()$data$aes |> dplyr::filter(!!sym(id_col()) == current_id()),
           paramVar = params()$settings$aes$term_col,
           aeStartVar = params()$settings$aes$stdy_col,
           aeEndVar = params()$settings$aes$endy_col,
@@ -51,8 +52,8 @@ ae_plot_server <- function(id, params, current_id) {
       }
     })
 
-    output$AEtable <- renderDT({
-      aes_sub() |> filter(!!sym(id_col()) == current_id())
+    output$AEtable <- DT::renderDT({
+      aes_sub() |> dplyr::filter(!!sym(id_col()) == current_id())
     })
   })
 }

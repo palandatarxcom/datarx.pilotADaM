@@ -17,7 +17,3 @@ a huxtable table
 gen_ht_t14_101
 Generate Table 14-1.01 Summary of Population
 }
-\examples{
-gen_ht_t14_101(adsl = adsl)
-
-}

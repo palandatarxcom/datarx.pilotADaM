@@ -17,7 +17,3 @@ a huxtable table
 gen_ht_t14_103
 Generate Table 14-1.03 Summary of Number of Subjects By Site
 }
-\examples{
-gen_ht_t14_103(adsl = adsl)
-
-}

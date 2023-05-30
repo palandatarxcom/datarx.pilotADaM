@@ -17,7 +17,3 @@ a huxtable
 gen_ht_t14_301
 Generate Table 14-3.01 Primary Endpoint Analysis: ADAS Cog (11) - Change from Baseline to Week 24 - LOCF
 }
-\examples{
-gen_ht_t14_301(adadas = adadas)
-
-}

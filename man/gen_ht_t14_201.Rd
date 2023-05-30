@@ -17,7 +17,3 @@ a huxtable table
 gen_ht_t14_201
 Generate Table 14-2.01 Summary of Demographic and Baseline Characteristics
 }
-\examples{
-gen_ht_t14_201(adsl)
-
-}
